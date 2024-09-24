@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 10:56:58 by temil-da          #+#    #+#             */
-/*   Updated: 2024/09/19 15:38:35 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/09/24 13:22:27 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ typedef enum
 	TOKEN_LITERAL,
 	TOKEN_OPERATOR,
 	TOKEN_SPECIAL,
+	TOKEN_INVALID_ARG,
 	TOKEN_UNKNOWN
 }		token_type;
 
@@ -55,14 +56,26 @@ typedef	struct	t_test_struct
 	bool						rightpipe;
 	t_command					*simple_command;
 	struct t_test_struct		*next;
-	char						**envp;
 }		command_table;
 
-void	executor(command_table *command);
+typedef struct t_minishell
+{
+	command_table	*table;
+	char			**env;
+}		t_minishell;
+
+void	executor(t_minishell *minishell);
 void	handle_echo(t_command *command);
-void	handle_pwd(command_table *table);
-void	handle_cd(command_table *table);
+void	handle_pwd(t_minishell *minishell);
+void	handle_cd(t_minishell *minishell);
+void	handle_env(t_minishell *minishell);
+void	handle_export(t_minishell *minishell);
+void	handle_unset(t_minishell *minishell);
+void	check_path(t_minishell *minishell);
+char	**list2array(t_minishell *minishell);
 char	**copy_env(char **envp);
-void	replace_env(command_table *table, char *path);
+void	free_env(t_minishell *minishell);
+void	swap_vars(char **newenv);
+void	replace_env(t_minishell *minishell, char *path);
 
 #endif
