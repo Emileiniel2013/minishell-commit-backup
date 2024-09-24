@@ -6,7 +6,7 @@
 /*   By: tndreka <tndreka@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 10:48:37 by tndreka           #+#    #+#             */
-/*   Updated: 2024/09/20 16:48:25 by tndreka          ###   ########.fr       */
+/*   Updated: 2024/09/24 21:09:12 by tndreka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,10 @@ typedef struct s_msh
 }	t_msh;
 
 
-int prompt();
+void prompt(t_msh *msh);
+
+
+char **create_env(char **envp);
+void free_env(t_msh *msh);
 
 #endif
