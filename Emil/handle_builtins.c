@@ -6,33 +6,40 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 15:24:36 by temil-da          #+#    #+#             */
-/*   Updated: 2024/09/24 16:00:41 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/09/25 16:45:57 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "includes/executor.h"
 
-void	handle_echo(t_command *command)
+void	handle_echo(t_minishell *minishell)  // echo only prints it's own arguments it does not process input from the pipe, but it can redirect it to other commands
 {
 	t_command	*command_cpy;
 	bool		nl;
 
 	nl = true;
-	command_cpy = command;
-	if (command_cpy->token == TOKEN_ARGUMENT)
-	{
-		nl = false;
-		command_cpy = command_cpy->next;
-	}
-	while (command_cpy != NULL)
-	{
-		printf("%s", command_cpy->content);
-		command_cpy = command_cpy->next;
-		if (command_cpy != NULL)
-			printf(" ");
-	}
-	if (nl == true)
+	command_cpy = minishell->table->simple_command;
+	
+	if (command_cpy->next == NULL)
 		printf("\n");
+	else
+	{
+		if (command_cpy->token == TOKEN_ARGUMENT)
+		{
+			nl = false;
+			command_cpy = command_cpy->next;
+		}
+		command_cpy = command_cpy->next;
+		while (command_cpy != NULL)
+		{
+			printf("%s", command_cpy->content);
+			command_cpy = command_cpy->next;
+			if (command_cpy != NULL)
+				printf(" ");
+		}
+		if (nl == true)
+			printf("\n");
+	}
 }
 
 void	handle_pwd(t_minishell *minishell)
@@ -150,6 +157,22 @@ void	handle_unset(t_minishell *minishell)
 	}
 }
 
+void	execute_file(t_minishell *minishell)
+{
+	char	*path;
+	char	**arg;
+
+	path = minishell->table->simple_command->content; // here we haven't decided how the command content will necesarly look like, maybe have a token to see if it is relative or absolute path?
+	if (access(path, X_OK) == 0)						//				if relative combine with cwd for the complete path based on the token
+	{
+		arg = malloc(sizeof(char *) * 2);
+		arg[0] = path;
+		arg[1] = NULL;
+		execve(path, arg, minishell->env);
+	}
+}
+
+
 void	check_path(t_minishell *minishell)
 {
 	char	*path;
@@ -159,8 +182,8 @@ void	check_path(t_minishell *minishell)
 
 	i = 0;
 	valid_cmd = false;	
-	path = getenv("PATH");
-	paths = ft_split(path, ':');
+	path = getenv("PATH"); // will not work for example when trying to unset path to see if the command will still work, because the command will still work enen though it shouldn't. we need to use our own env
+	paths = ft_split(path, ':');				// maybe write custom env function because it has it's use in multiple functions
 	path = NULL;
 	while (paths[i] != NULL)
 	{

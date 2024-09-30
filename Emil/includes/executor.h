@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 10:56:58 by temil-da          #+#    #+#             */
-/*   Updated: 2024/09/24 13:22:27 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/09/25 16:33:13 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,6 @@
 # include <termios.h>
 # include <curses.h>
 
-# ifndef STD_OUT
-#  define STD_OUT 1
-# endif
-
 typedef enum
 {
 	TOKEN_COMMAND,
@@ -40,8 +36,9 @@ typedef enum
 	TOKEN_OPERATOR,
 	TOKEN_SPECIAL,
 	TOKEN_INVALID_ARG,
+	TOKEN_EXECUTABLE,
 	TOKEN_UNKNOWN
-}		token_type;
+}token_type;
 
 typedef struct	t_simple_command
 {
@@ -62,15 +59,17 @@ typedef struct t_minishell
 {
 	command_table	*table;
 	char			**env;
+	int				std_out_fd;
 }		t_minishell;
 
 void	executor(t_minishell *minishell);
-void	handle_echo(t_command *command);
+void	handle_echo(t_minishell *minishell);
 void	handle_pwd(t_minishell *minishell);
 void	handle_cd(t_minishell *minishell);
 void	handle_env(t_minishell *minishell);
 void	handle_export(t_minishell *minishell);
 void	handle_unset(t_minishell *minishell);
+void	execute_file(t_minishell *minishell);
 void	check_path(t_minishell *minishell);
 char	**list2array(t_minishell *minishell);
 char	**copy_env(char **envp);

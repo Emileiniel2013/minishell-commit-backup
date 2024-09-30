@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 15:36:41 by temil-da          #+#    #+#             */
-/*   Updated: 2024/09/24 16:06:39 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/09/25 16:43:27 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ void	swap_vars(char **newenv)
 
 char	**list2array(t_minishell *minishell)
 {
-	int	i;
+	int			i;
 	t_command	*cmd;
 	char		**arg_arr;
 
