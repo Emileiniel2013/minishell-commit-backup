@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 10:56:58 by temil-da          #+#    #+#             */
-/*   Updated: 2024/09/19 15:38:35 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/02 13:45:40 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,6 @@
 # include <termios.h>
 # include <curses.h>
 
-# ifndef STD_OUT
-#  define STD_OUT 1
-# endif
-
 typedef enum
 {
 	TOKEN_COMMAND,
@@ -39,8 +35,10 @@ typedef enum
 	TOKEN_LITERAL,
 	TOKEN_OPERATOR,
 	TOKEN_SPECIAL,
+	TOKEN_INVALID_ARG,
+	TOKEN_EXECUTABLE,
 	TOKEN_UNKNOWN
-}		token_type;
+}token_type;
 
 typedef struct	t_simple_command
 {
@@ -53,16 +51,35 @@ typedef	struct	t_test_struct
 {
 	bool						leftpipe;
 	bool						rightpipe;
+	bool						builtin;
 	t_command					*simple_command;
 	struct t_test_struct		*next;
-	char						**envp;
 }		command_table;
 
-void	executor(command_table *command);
-void	handle_echo(t_command *command);
-void	handle_pwd(command_table *table);
-void	handle_cd(command_table *table);
+typedef struct t_minishell
+{
+	command_table	*table;
+	char			**env;
+	int				std_out_fd;
+	char			**var_lst;
+}		t_minishell;
+
+void	executor(t_minishell *minishell);
+void	handle_echo(t_minishell *minishell);
+void	handle_pwd(t_minishell *minishell);
+void	handle_cd(t_minishell *minishell);
+void	handle_env(t_minishell *minishell);
+void	handle_export(t_minishell *minishell);
+void	handle_unset(t_minishell *minishell);
+void	execute_file(t_minishell *minishell);
+void	check_path(t_minishell *minishell);
+char	**list2array(t_minishell *minishell);
 char	**copy_env(char **envp);
-void	replace_env(command_table *table, char *path);
+void	free_env(t_minishell *minishell);
+void	swap_vars(char **newenv);
+void	replace_env(t_minishell *minishell, char *path);
+char	*ft_getcwd(t_minishell *minishell);
+char	*ft_getenv(t_minishell *minishell, char	*env);
+char	**create_arg_lst(t_minishell *minishell);
 
 #endif
