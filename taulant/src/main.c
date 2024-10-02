@@ -6,7 +6,7 @@
 /*   By: tndreka <tndreka@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 10:48:48 by tndreka           #+#    #+#             */
-/*   Updated: 2024/09/24 21:13:43 by tndreka          ###   ########.fr       */
+/*   Updated: 2024/09/30 14:04:58 by tndreka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,6 @@ int main(int ac, char *av[], char *envp[])
 	msh.env = create_env(envp);
 	atexit(leaks);
 	prompt(&msh);
-	free_env(&msh);
+	free_env(&msh);	
 	return(0);
 }

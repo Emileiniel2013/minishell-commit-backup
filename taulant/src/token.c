@@ -1,22 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   initialization.c                                   :+:      :+:    :+:   */
+/*   token.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tndreka <tndreka@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/24 16:39:47 by tndreka           #+#    #+#             */
-/*   Updated: 2024/09/24 17:33:10 by tndreka          ###   ########.fr       */
+/*   Created: 2024/10/02 17:41:30 by tndreka           #+#    #+#             */
+/*   Updated: 2024/10/02 18:18:54 by tndreka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/mini_sh.h"
+#include "include/mini_sh.h"
 
-// int start_bash(int ac, char *av[], char *envp[])
+// Here we will have the main function in lexer
+
+// t_token lexer(char *prompt)
 // {
-// 	(void)ac;
-// 	(void)av;
-// 	(void)envp;
-// 	prompt();
-// 	return(0);
+// 		//implement	
 // }
