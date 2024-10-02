@@ -6,7 +6,7 @@
 #    By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/02 11:51:28 by temil-da          #+#    #+#              #
-#    Updated: 2024/10/01 15:00:24 by temil-da         ###   ########.fr        #
+#    Updated: 2024/10/02 17:50:44 by temil-da         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,13 +16,13 @@ CFLAGS = -Wall -Wextra -Werror
 
 LFLAGS =  -lreadline -lcurses
 
-CC = cc -g
+CC = cc
 
 LIBFT_DIR = includes/libft
 
 LIBFT = $(LIBFT_DIR)/libft.a
 
-SRC = executor.c handle_builtins.c helper_functions.c
+SRC = executor.c handle_builtins.c helper_functions.c main.c
 
 OBJ = $(SRC:.c=.o)
 

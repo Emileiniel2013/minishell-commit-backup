@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 15:24:36 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/02 14:28:22 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/02 15:50:57 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,10 +73,17 @@ void	handle_pwd(t_minishell *minishell)
 void	handle_cd(t_minishell *minishell)
 {
 	char	*path;
-	char	*cwd;
+	char	cwd[1024];
 
 	if (minishell->table->next == NULL)
-		path = ft_strdup("/Users/temil-da");
+	{
+		path = ft_getenv(minishell, "HOME");
+		if (!path)
+		{
+			printf("Minishell: cd: HOME not set\n");
+			return ;
+		}
+	}
 	else
 		path = minishell->table->simple_command->next->content;
 	if (chdir(path) != 0)
@@ -84,7 +91,7 @@ void	handle_cd(t_minishell *minishell)
 		printf("Minishell: cd: %s: No such file or directory\n", path);
 		return ;
 	}
-	cwd = ft_getcwd(minishell);
+	getcwd(cwd, sizeof(cwd));
 	replace_env(minishell, cwd);
 }
 
@@ -110,16 +117,21 @@ void	handle_export(t_minishell *minishell)
 	newenv = NULL;
 	minishell->table->simple_command = minishell->table->simple_command->next;
 	newvar = minishell->table->simple_command->content;
-	while (minishell->env[i] != NULL)
-		i++;
-	newenv = malloc(sizeof(char *) * (i + 2));
-	newenv[i + 1] = NULL;
-	newenv[i] = ft_strdup(newvar);
-	while (--i >= 0)
-		newenv[i] = ft_strdup(minishell->env[i]);
-	swap_vars(newenv);
-	free_env(minishell);
-	minishell->env = newenv;
+	if (ft_strchr(newvar, '=') == NULL)
+		newvar = ft_check_var_lst(minishell, minishell->table->simple_command->content);
+	if (newvar)
+	{
+		while (minishell->env[i] != NULL)
+			i++;
+		newenv = malloc(sizeof(char *) * (i + 2));
+		newenv[i + 1] = NULL;
+		newenv[i] = ft_strdup(newvar);
+		while (--i >= 0)
+			newenv[i] = ft_strdup(minishell->env[i]);
+		swap_vars(newenv);
+		free_env(minishell);
+		minishell->env = newenv;
+	}
 	if (minishell->table->simple_command->next != NULL)
 		handle_export(minishell);
 }
@@ -138,10 +150,10 @@ void	handle_unset(t_minishell *minishell)
 	while (--i >= 0)
 	{
 		len = ft_strlen(var);
-		if (ft_strncmp(minishell->env[i], var, len) == 0)
+		if (ft_strncmp(minishell->env[i], var, len) == 0 && minishell->env[i][len] == '=')
 		{
 			free(minishell->env[i]);
-			while (minishell->env[i] != NULL)
+			while (minishell->env[i + 1])
 			{
 				minishell->env[i] = minishell->env[i + 1];
 				i++;
