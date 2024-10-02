@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 15:36:41 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/02 14:17:25 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/02 15:46:00 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,14 @@ void	free_env(t_minishell *minishell)
 		i--;
 	}
 	free(minishell->env);
+	if (minishell->var_lst)
+	{
+		if (!minishell->var_lst[i])
+		{
+			free(minishell->var_lst);
+			minishell->var_lst = NULL;
+		}
+	}
 }
 
 void	swap_vars(char **newenv)
@@ -113,7 +121,7 @@ char	*ft_getenv(t_minishell *minishell, char	*env)
 	i = -1;
 	while(minishell->env[++i])
 	{
-		if(ft_strncmp(minishell->env[i], env, len) == 0)
+		if(ft_strncmp(minishell->env[i], env, len) == 0 && minishell->env[i][len] == '=')
 		{
 			var = ft_strdup(minishell->env[i] + len + 1);
 			return (var);
@@ -149,4 +157,33 @@ char	**create_arg_lst(t_minishell *minishell)
 		}
 	}
 	return (arg_arr);
+}
+
+char	*ft_check_var_lst(t_minishell *minishell, char *var)
+{
+	int		i;
+	size_t	len;
+	char	*new_var;
+
+	i = -1;
+	len = ft_strlen(var);
+	new_var = NULL;
+	if (!minishell->var_lst)
+		return (NULL);
+	while(minishell->var_lst[++i])
+	{
+		if (ft_strncmp(minishell->var_lst[i], var, len) == 0 && minishell->var_lst[i][len] == '=')
+		{
+			new_var = ft_strdup(minishell->var_lst[i]);
+			free(minishell->var_lst[i]);
+			while(minishell->var_lst[i + 1])
+			{
+				minishell->var_lst[i] = minishell->var_lst[i + 1];
+				i++;
+			}
+			minishell->var_lst[i] = NULL;
+			return (new_var);
+		}
+	}
+	return (new_var);
 }

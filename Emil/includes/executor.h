@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 10:56:58 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/02 13:45:40 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/02 17:53:11 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,6 @@ typedef enum
 	TOKEN_OPERATOR,
 	TOKEN_SPECIAL,
 	TOKEN_INVALID_ARG,
-	TOKEN_EXECUTABLE,
 	TOKEN_UNKNOWN
 }token_type;
 
@@ -60,7 +59,6 @@ typedef struct t_minishell
 {
 	command_table	*table;
 	char			**env;
-	int				std_out_fd;
 	char			**var_lst;
 }		t_minishell;
 
@@ -81,5 +79,6 @@ void	replace_env(t_minishell *minishell, char *path);
 char	*ft_getcwd(t_minishell *minishell);
 char	*ft_getenv(t_minishell *minishell, char	*env);
 char	**create_arg_lst(t_minishell *minishell);
+char	*ft_check_var_lst(t_minishell *minishell, char *var);
 
 #endif

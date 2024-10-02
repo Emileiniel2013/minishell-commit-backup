@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 11:41:14 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/02 14:15:36 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/02 17:49:50 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	executor(t_minishell *minishell)
 			handle_export(minishell);
 		else if (ft_strncmp(minishell->table->simple_command->content, "unset", 5) == 0)
 			handle_unset(minishell);
-		else if (minishell->table->simple_command->token == TOKEN_EXECUTABLE)
+		else if ((ft_strncmp (minishell->table->simple_command->content, "./", 2)) == 0)
 			execute_file(minishell);
 		else
 			check_path(minishell);
@@ -104,62 +104,4 @@ char	**copy_env(char **envp)
 		i++;
 	}
 	return (cpy);
-}
-
-
-int	main(int argc, char *argv[], char *envp[])
-{
-	t_minishell			*minishell;
-	command_table		*table;
-	// command_table		*table_2;
-	// command_table		*table_3;
-	t_command			*command_head;
-	t_command			*next_command;
-	t_command			*current_command;
-
-	char				**envp_cpy;
-	int					i;
-	(void)argv;
-	(void)argc;
-	
-	
-	i = 0;
-	minishell = malloc(sizeof(t_minishell));
-	table = malloc(sizeof(t_command));
-	envp_cpy = copy_env(envp);
-	minishell->table = table;
-	minishell->env = envp_cpy;
-	minishell->std_out_fd = 1;
-	minishell->table->leftpipe = false;
-	minishell->table->rightpipe = false;
-	minishell->table->builtin = true;
-	minishell->var_lst = NULL;
-
-	command_head = malloc(sizeof(t_command));
-	table->simple_command = command_head;
-	command_head->content = malloc(sizeof(char) * 7);
-	ft_strlcpy(command_head->content, "export", 7);
-	command_head->token = TOKEN_COMMAND;
-	
-	next_command = malloc(sizeof(t_command));
-	next_command->content = malloc(sizeof(char) * 19);
-	ft_strlcpy(next_command->content, "VAR1=TestNebun2003", 19);
-	next_command->token = TOKEN_LITERAL;
-	next_command->next = NULL;
-	command_head->next = next_command;
-
-	current_command = next_command;
-	next_command = malloc(sizeof(t_command));
-	next_command->content = malloc(sizeof(char) * 19);
-	ft_strlcpy(next_command->content, "VAR2=TestNebun2009", 19);
-	next_command->next = NULL;
-	next_command->token = TOKEN_LITERAL;
-	current_command->next = next_command;
-
-	execute_file(minishell);
-	if (!minishell->table->rightpipe && minishell->table->builtin)
-		executor(minishell);
-	else
-		mini_main(minishell);
-	return (0);
 }
