@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 10:56:58 by temil-da          #+#    #+#             */
-/*   Updated: 2024/09/25 16:33:13 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/02 13:45:40 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ typedef	struct	t_test_struct
 {
 	bool						leftpipe;
 	bool						rightpipe;
+	bool						builtin;
 	t_command					*simple_command;
 	struct t_test_struct		*next;
 }		command_table;
@@ -60,6 +61,7 @@ typedef struct t_minishell
 	command_table	*table;
 	char			**env;
 	int				std_out_fd;
+	char			**var_lst;
 }		t_minishell;
 
 void	executor(t_minishell *minishell);
@@ -76,5 +78,8 @@ char	**copy_env(char **envp);
 void	free_env(t_minishell *minishell);
 void	swap_vars(char **newenv);
 void	replace_env(t_minishell *minishell, char *path);
+char	*ft_getcwd(t_minishell *minishell);
+char	*ft_getenv(t_minishell *minishell, char	*env);
+char	**create_arg_lst(t_minishell *minishell);
 
 #endif

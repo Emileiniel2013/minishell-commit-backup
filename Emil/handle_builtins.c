@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 15:24:36 by temil-da          #+#    #+#             */
-/*   Updated: 2024/09/25 16:45:57 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/02 14:28:22 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,8 +56,7 @@ void	handle_pwd(t_minishell *minishell)
 		size = ft_strlen(minishell->env[i]);
 		if (ft_strnstr(minishell->env[i], "PWD=/", size) != NULL)
 		{
-			line = malloc(sizeof(char) * size + 1);
-			ft_strlcpy(line, minishell->env[i], size + 1);
+			line = ft_strdup(minishell->env[i]);
 			break;
 		}
 		i++;
@@ -74,13 +73,10 @@ void	handle_pwd(t_minishell *minishell)
 void	handle_cd(t_minishell *minishell)
 {
 	char	*path;
-	char	cwd[1024];
+	char	*cwd;
 
 	if (minishell->table->next == NULL)
-	{
-		path = malloc(sizeof(char) * 16);
-		ft_strlcpy(path, "/Users/temil-da", 16);
-	}
+		path = ft_strdup("/Users/temil-da");
 	else
 		path = minishell->table->simple_command->next->content;
 	if (chdir(path) != 0)
@@ -88,7 +84,7 @@ void	handle_cd(t_minishell *minishell)
 		printf("Minishell: cd: %s: No such file or directory\n", path);
 		return ;
 	}
-	getcwd(cwd, sizeof(cwd));
+	cwd = ft_getcwd(minishell);
 	replace_env(minishell, cwd);
 }
 
@@ -108,26 +104,24 @@ void	handle_export(t_minishell *minishell)
 {
 	char	**newenv;
 	int		i;
-	size_t	len;
+	char	*newvar;
 	
 	i = 0;
 	newenv = NULL;
+	minishell->table->simple_command = minishell->table->simple_command->next;
+	newvar = minishell->table->simple_command->content;
 	while (minishell->env[i] != NULL)
 		i++;
-	newenv = malloc(sizeof(char *) * i + 1);
+	newenv = malloc(sizeof(char *) * (i + 2));
 	newenv[i + 1] = NULL;
-	len = ft_strlen(minishell->table->simple_command->next->content);
-	newenv[i] = malloc(sizeof(char) * len + 1);
-	ft_strlcpy(newenv[i], minishell->table->simple_command->next->content, len + 1);	
+	newenv[i] = ft_strdup(newvar);
 	while (--i >= 0)
-	{
-		len = ft_strlen(minishell->env[i]);
-		newenv[i] = malloc(sizeof(char) * len + 1);
-		ft_strlcpy(newenv[i], minishell->env[i], len + 1);
-	}
+		newenv[i] = ft_strdup(minishell->env[i]);
 	swap_vars(newenv);
 	free_env(minishell);
 	minishell->env = newenv;
+	if (minishell->table->simple_command->next != NULL)
+		handle_export(minishell);
 }
 
 void	handle_unset(t_minishell *minishell)
@@ -137,7 +131,8 @@ void	handle_unset(t_minishell *minishell)
 	size_t	len;
 
 	i = 0;
-	var = minishell->table->simple_command->next->content;
+	minishell->table->simple_command = minishell->table->simple_command->next;
+	var = minishell->table->simple_command->content;
 	while (minishell->env[i] != NULL)
 		i++;
 	while (--i >= 0)
@@ -155,23 +150,31 @@ void	handle_unset(t_minishell *minishell)
 			break;
 		}
 	}
+	if (minishell->table->simple_command->next != NULL)
+		handle_unset(minishell);
 }
 
 void	execute_file(t_minishell *minishell)
 {
 	char	*path;
-	char	**arg;
+	char	**arg_arr;
 
-	path = minishell->table->simple_command->content; // here we haven't decided how the command content will necesarly look like, maybe have a token to see if it is relative or absolute path?
-	if (access(path, X_OK) == 0)						//				if relative combine with cwd for the complete path based on the token
+	path = minishell->table->simple_command->content;
+	path = ft_strjoin(ft_getcwd(minishell), path + 1);
+	if (access(path, X_OK) == 0)
 	{
-		arg = malloc(sizeof(char *) * 2);
-		arg[0] = path;
-		arg[1] = NULL;
-		execve(path, arg, minishell->env);
+		arg_arr = create_arg_lst(minishell);
+		if (!arg_arr)
+		{
+			arg_arr = malloc(sizeof(char *) * 2);
+			arg_arr[0] = ft_strdup(minishell->table->simple_command->content);
+			arg_arr[1] = NULL;
+		}
+		execve(path, arg_arr, minishell->env);
 	}
+	else
+		printf("Minishell: cd: %s: No such file or directory\n", path);
 }
-
 
 void	check_path(t_minishell *minishell)
 {
@@ -182,8 +185,8 @@ void	check_path(t_minishell *minishell)
 
 	i = 0;
 	valid_cmd = false;	
-	path = getenv("PATH"); // will not work for example when trying to unset path to see if the command will still work, because the command will still work enen though it shouldn't. we need to use our own env
-	paths = ft_split(path, ':');				// maybe write custom env function because it has it's use in multiple functions
+	path = ft_getenv(minishell, "PATH");
+	paths = ft_split(path, ':');
 	path = NULL;
 	while (paths[i] != NULL)
 	{

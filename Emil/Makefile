@@ -6,7 +6,7 @@
 #    By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/02 11:51:28 by temil-da          #+#    #+#              #
-#    Updated: 2024/09/19 15:37:11 by temil-da         ###   ########.fr        #
+#    Updated: 2024/10/01 15:00:24 by temil-da         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,7 @@ CFLAGS = -Wall -Wextra -Werror
 
 LFLAGS =  -lreadline -lcurses
 
-CC = cc
+CC = cc -g
 
 LIBFT_DIR = includes/libft
 
