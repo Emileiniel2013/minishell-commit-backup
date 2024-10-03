@@ -6,7 +6,7 @@
 #    By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/02 11:51:28 by temil-da          #+#    #+#              #
-#    Updated: 2024/10/02 17:50:44 by temil-da         ###   ########.fr        #
+#    Updated: 2024/10/03 14:46:57 by temil-da         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,9 @@ LIBFT_DIR = includes/libft
 
 LIBFT = $(LIBFT_DIR)/libft.a
 
-SRC = executor.c handle_builtins.c helper_functions.c main.c
+SRC = execution/executor.c execution/handle_builtins.c execution/helper_functions.c main.c \
+	parsing/parser.c \
+	lexing/lexer.c
 
 OBJ = $(SRC:.c=.o)
 

@@ -6,11 +6,11 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 11:41:14 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/02 17:49:50 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/03 14:25:31 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/executor.h"
+#include "../includes/executor.h"
 
 void	executor(t_minishell *minishell)
 {
@@ -56,7 +56,7 @@ void	mini_main(t_minishell *minishell)
 			}
 			if (minishell->table->rightpipe == true)
 			{
-				dup2(pipefd[1], minishell->std_out_fd);
+				dup2(pipefd[1], STDOUT_FILENO);
 				close(pipefd[1]);
 				close(pipefd[0]);
 			}

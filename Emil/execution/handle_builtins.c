@@ -6,11 +6,11 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 15:24:36 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/02 15:50:57 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/03 14:25:36 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/executor.h"
+#include "../includes/executor.h"
 
 void	handle_echo(t_minishell *minishell)  // echo only prints it's own arguments it does not process input from the pipe, but it can redirect it to other commands
 {

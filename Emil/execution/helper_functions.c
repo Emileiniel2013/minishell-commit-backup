@@ -6,11 +6,11 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 15:36:41 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/02 15:46:00 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/03 14:26:43 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/executor.h"
+#include "../includes/executor.h"
 
 void	replace_env(t_minishell *minishell, char *path)
 {
