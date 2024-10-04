@@ -6,12 +6,11 @@
 /*   By: tndreka <tndreka@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/02 18:01:48 by tndreka           #+#    #+#             */
-/*   Updated: 2024/10/02 18:19:14 by tndreka          ###   ########.fr       */
+/*   Updated: 2024/10/04 20:50:53 by tndreka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "include/mini_sh.h"
-
+#include "../include/mini_sh.h"
 //Here are the helper functions for the token's
 
 /*
@@ -56,4 +55,52 @@ t_token *create_tok(char *data, token_type type)
 	token->type = type;
 	token->next = NULL;
 	return (token);
+}
+
+void add_token(t_token **tokens, t_token *new_token)
+{
+	t_token *temp;
+	
+	if(!*tokens)
+		*tokens = new_token;
+	else
+	{
+		temp = *tokens;
+		while (temp->next)
+		{
+			temp = temp->next;
+		}		
+		temp->next = new_token;
+	}
+}
+
+int ft_isspace(char c)
+{
+	return (c == ' ');
+}
+
+char *create_redir_arr(char c)
+{
+	char *arr;
+
+	arr = malloc(2 * sizeof(char));
+	if (!arr)
+	{
+		perror("malloc of red_arr failed->> create_red_arr[]");
+		return NULL;
+	}
+	arr[0] = c;
+	arr[1] = '\0';
+	return arr;
+}
+
+void print_token(t_token *tokens)
+{
+	
+	while (tokens)
+	{
+		printf("Token : %s\n" , tokens->data);
+		tokens = tokens->next;
+			
+	}
 }

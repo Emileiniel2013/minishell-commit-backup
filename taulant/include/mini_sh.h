@@ -6,7 +6,7 @@
 /*   By: tndreka <tndreka@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 10:48:37 by tndreka           #+#    #+#             */
-/*   Updated: 2024/10/02 18:19:55 by tndreka          ###   ########.fr       */
+/*   Updated: 2024/10/04 18:30:41 by tndreka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,8 @@
 //=========== STRUCTS =====================
 
 typedef enum {
+	TOKEN_COMMAND,
+	TOKEN_ARGUMENT,
 	TOKEN_WORD,
 	TOKEN_PIPE,
 	TOKEN_RIDIRECTION,
@@ -97,12 +99,22 @@ void prompt(t_msh *msh);
 char **create_env(char **envp);
 void free_env(t_msh *msh);
 
-// LEXING 
-int is_this(char c);
+// LEXING
+int ft_isspace(char c); // chec if it is a white space
+ 
+int is_this(char c);  // checks the delimeter
 
-token_type get_token_type(char c);
+token_type get_token_type(char c); // check what type of token is
 
-t_token *create_tok(char *data, token_type type);
+t_token *create_tok(char *data, token_type type); // creates a token 
 
+void add_token(t_token **tokens, t_token *new_token); // ad the token to the list of tokens
 
+char *create_redir_arr(char c);
+
+t_token *lexer(char *prompt);
+
+void free_token(t_token *head);
+
+void print_token(t_token *tokens);
 #endif
