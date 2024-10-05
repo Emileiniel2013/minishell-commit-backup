@@ -6,7 +6,7 @@
 /*   By: tndreka <tndreka@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 10:48:37 by tndreka           #+#    #+#             */
-/*   Updated: 2024/10/05 12:55:28 by tndreka          ###   ########.fr       */
+/*   Updated: 2024/10/05 15:46:10 by tndreka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,14 +35,17 @@
 
 //=========== STRUCTS =====================
 
-typedef enum {
+typedef enum s_token{
 	TOKEN_COMMAND,
 	TOKEN_ARGUMENT,
 	TOKEN_WORD,
 	TOKEN_PIPE,
-	TOKEN_RIDIRECTION,
-	TOKEN_UNKNOWN 	
-}	token_type;
+	TOKEN_RIDIRECTION_LESS,
+	TOKEN_RIDIRECTION_LESS_LESS, 	
+	TOKEN_RIDIRECTION_GREAT, 	
+	TOKEN_RIDIRECTION_GREAT_GREAT,
+	TOKEN_UNKNOWN
+}	t_token;
 
 /*
 	COMMAND STRUCT
@@ -57,31 +60,21 @@ typedef struct s_comands
 }   t_comands;
 
 /*
-	LEXER STRUCT
+	LEXING STRUCT
 */
 typedef struct s_lexer
 {
-	char		*input; // the original input 
-	t_comands	*comands; // pointer to the commands => STRUCT
-	int			n_of_cmd; // Number of commands
+	char				*data;
+	t_token				type;
+	struct s_lexer		*next;
 }	t_lexer;
-
-/*
-	LEXING STRUCT
-*/
-typedef struct s_token
-{
-	char		*data;
-	token_type	type;
-	struct s_token *next;
-}	t_token;
 
 /*
 	PARSING STRUCT
 */
 typedef struct s_parser
-{	
-	
+{
+		
 }	t_parser;
 
 
@@ -110,17 +103,17 @@ int ft_isspace(char c); // chec if it is a white space
  
 int is_this(char c);  // checks the delimeter
 
-token_type get_token_type(char c); // check what type of token is
+t_token get_token_type(char c); // check what type of token is
 
-t_token *create_tok(char *data, token_type type); // creates a token 
+t_lexer *create_tok(char *data, t_token type); // creates a token 
 
-void add_token(t_token **tokens, t_token *new_token); // ad the token to the list of tokens
+void add_token(t_lexer **tokens, t_lexer *new_token); // ad the token to the list of tokens
 
 char *create_redir_arr(char c);
 
-t_token *lexer(char *prompt);
+t_lexer *lexer(char *prompt);
 
-void free_token(t_token *head);
+void free_token(t_lexer *head);
 
-void print_token(t_token *tokens);
+void print_token(t_lexer *tokens);
 #endif

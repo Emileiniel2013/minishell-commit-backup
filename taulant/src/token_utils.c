@@ -6,7 +6,7 @@
 /*   By: tndreka <tndreka@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/02 18:01:48 by tndreka           #+#    #+#             */
-/*   Updated: 2024/10/05 13:59:53 by tndreka          ###   ########.fr       */
+/*   Updated: 2024/10/05 15:46:19 by tndreka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,22 +30,28 @@ int is_this(char c)
 	and sets the token type
 */
 
-token_type get_token_type(char c)
+t_token get_token_type(char c)
 {
 	if (c == '|')
 		return TOKEN_PIPE;
-	if (c == '<' || c == '>')
-		return TOKEN_RIDIRECTION;
+	else if (c == '<')
+		return TOKEN_RIDIRECTION_LESS;
+	else if (c == '>')
+		return TOKEN_RIDIRECTION_GREAT;
+	else if (ft_strncmp(&c, "<<", 2) == 0)
+		return TOKEN_RIDIRECTION_LESS_LESS;
+	else if (ft_strncmp(&c, ">>", 2) == 0)
+		return TOKEN_RIDIRECTION_GREAT_GREAT;
 	else
 		return TOKEN_UNKNOWN;
 }
 
 
-t_token *create_tok(char *data, token_type type)
+t_lexer *create_tok(char *data, t_token type)
 {
-	t_token *token;
+	t_lexer *token;
 
-	token = malloc (sizeof(t_token));
+	token = malloc (sizeof(t_lexer));
 	if (token == NULL)
 	{
 		perror("Malloc for tokens failed--->create_tok()\n");
@@ -57,9 +63,9 @@ t_token *create_tok(char *data, token_type type)
 	return (token);
 }
 
-void add_token(t_token **tokens, t_token *new_token)
+void add_token(t_lexer **tokens, t_lexer *new_token)
 {
-	t_token *temp;
+	t_lexer *temp;
 	
 	if(!*tokens)
 		*tokens = new_token;
@@ -94,7 +100,7 @@ char *create_redir_arr(char c)
 	return arr;
 }
 
-void print_token(t_token *tokens)
+void print_token(t_lexer *tokens)
 {
 	char *str;
 	//printf("ERROR HERE\n");
@@ -111,10 +117,25 @@ void print_token(t_token *tokens)
 			//printf("ERROR HERE3\n");
 			str = "PIPE";
 		}
-		else if (tokens->type == TOKEN_RIDIRECTION)
+		else if (tokens->type == TOKEN_RIDIRECTION_LESS)
 		{
 			//printf("ERROR HERE4\n");
-			str = "RIDIRECTION";
+			str = "RIDIRECTION_LESS";
+		}
+		else if (tokens->type == TOKEN_RIDIRECTION_GREAT)
+		{
+			//printf("ERROR HERE4\n");
+			str = "RIDIRECTION_GREAT";
+		}
+		else if (tokens->type == TOKEN_RIDIRECTION_LESS_LESS)
+		{
+			//printf("ERROR HERE4\n");
+			str = "RIDIRECTION_LESS_LESS";
+		}
+		else if (tokens->type == TOKEN_RIDIRECTION_GREAT_GREAT)
+		{
+			//printf("ERROR HERE4\n");
+			str = "RIDIRECTION_GREAT_GREAT";
 		}
 		else
 		{

@@ -6,7 +6,7 @@
 /*   By: tndreka <tndreka@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/02 17:41:30 by tndreka           #+#    #+#             */
-/*   Updated: 2024/10/05 14:01:47 by tndreka          ###   ########.fr       */
+/*   Updated: 2024/10/05 15:53:26 by tndreka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,11 +17,11 @@
 	t
 */
 
-t_token *lexer(char *prompt)
+t_lexer *lexer(char *prompt)
 {
 	char *buffer;
-	t_token *head = NULL;
-	t_token *current = NULL;
+	t_lexer *head = NULL;
+	t_lexer *current = NULL;
 	size_t len = 0;
 	int i = 0;
 
@@ -35,11 +35,35 @@ t_token *lexer(char *prompt)
 			add_token(&head, current);
 			i++;
 		}
-		else if (prompt[i] == '>' || prompt[i] == '<')
+		else if (prompt[i] == '>')
 		{
-			current = create_tok(create_redir_arr(prompt[i]), TOKEN_RIDIRECTION);
-			add_token(&head, current);
-			i++;
+			if (prompt[i + 1] == '>')
+			{
+				current = create_tok(create_redir_arr(prompt[i]), TOKEN_RIDIRECTION_GREAT_GREAT);	
+				add_token(&head, current);
+				i += 2;
+			}
+			else
+			{
+				current = create_tok(create_redir_arr(prompt[i]), TOKEN_RIDIRECTION_GREAT);
+				add_token(&head, current);	
+				i++;
+			}
+		}
+		else if (prompt[i] == '<')
+		{
+			if (prompt[i + 1] == '<')
+			{
+				current = create_tok(create_redir_arr(prompt[i]), TOKEN_RIDIRECTION_LESS_LESS);	
+				add_token(&head, current);
+				i += 2;
+			}
+			else
+			{
+				current = create_tok(create_redir_arr(prompt[i]), TOKEN_RIDIRECTION_LESS);
+				add_token(&head, current);	
+				i++;
+			}
 		}
 		else if (prompt[i])
 		{
@@ -66,9 +90,9 @@ t_token *lexer(char *prompt)
 	return head;	
 }
 
-void free_token(t_token *head)
+void free_token(t_lexer *head)
 {
-	t_token *tmp;
+	t_lexer *tmp;
 	while (head)
 	{
 		tmp = head;

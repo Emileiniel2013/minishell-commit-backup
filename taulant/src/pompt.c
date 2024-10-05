@@ -6,7 +6,7 @@
 /*   By: tndreka <tndreka@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/20 16:16:58 by tndreka           #+#    #+#             */
-/*   Updated: 2024/10/05 13:00:03 by tndreka          ###   ########.fr       */
+/*   Updated: 2024/10/05 15:36:03 by tndreka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 void prompt(t_msh *msh)
 {
 	char	*prompt;
-	t_token *tokens;
+	t_lexer *tokens;
 	size_t i = 0;
 	if (!isatty(STDIN_FILENO))
  		return ;
