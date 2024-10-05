@@ -1,32 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strdup.c                                        :+:      :+:    :+:   */
+/*   helper_functions.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/03/11 19:29:22 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/05 14:40:14 by temil-da         ###   ########.fr       */
+/*   Created: 2024/10/03 15:13:00 by temil-da          #+#    #+#             */
+/*   Updated: 2024/10/03 15:27:37 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "../includes/parser.h"
 
-char	*ft_strdup(const char *s1)
+char	**copy_env(char **envp)
 {
-	int		j;
-	char	*cpy;
+	char	**cpy;
+	int		i;
+	size_t	size;
 
-	j = 0;
-	cpy = (char *)malloc(sizeof(char) * ft_strlen(s1) + 1);
-	if (!cpy)
-		return (NULL);
-	while (*s1)
+	i = 0;
+	size = 0;
+	while (envp[i] != NULL)
+		i++;
+	cpy = malloc(sizeof(char *) * (i + 1));
+	cpy[i] = NULL;
+	i = 0;
+	while (envp[i] != NULL)
 	{
-		cpy[j] = *s1;
-		s1++;
-		j++;
+		size = ft_strlen(envp[i]);
+		cpy[i] = ft_strdup(envp[i]);
+		i++;
 	}
-	cpy[j] = '\0';
 	return (cpy);
 }

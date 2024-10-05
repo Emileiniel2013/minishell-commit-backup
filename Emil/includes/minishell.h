@@ -1,32 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strdup.c                                        :+:      :+:    :+:   */
+/*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/03/11 19:29:22 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/05 14:40:14 by temil-da         ###   ########.fr       */
+/*   Created: 2024/10/03 13:43:12 by temil-da          #+#    #+#             */
+/*   Updated: 2024/10/03 15:25:56 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#ifndef MINISHELL_H
+# define MINISHELL_H
 
-char	*ft_strdup(const char *s1)
-{
-	int		j;
-	char	*cpy;
+# include "lexer.h"
+# include "parser.h"
+# include "executor.h"
+# include <readline/readline.h>
+# include <readline/history.h>
 
-	j = 0;
-	cpy = (char *)malloc(sizeof(char) * ft_strlen(s1) + 1);
-	if (!cpy)
-		return (NULL);
-	while (*s1)
-	{
-		cpy[j] = *s1;
-		s1++;
-		j++;
-	}
-	cpy[j] = '\0';
-	return (cpy);
-}
+
+#endif

@@ -5,36 +5,62 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/03 13:32:53 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/03 14:51:57 by temil-da         ###   ########.fr       */
+/*   Created: 2024/10/03 13:27:42 by temil-da          #+#    #+#             */
+/*   Updated: 2024/10/05 17:06:04 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef LEXER_H
+#ifndef PARSER_H
 
-# define LEXER_H
+# define PARSER_H
 
-# include "parser.h"
-# include <stdbool.h>
+# include "libft/libft.h"
+# include <stdio.h>
+# include <sys/types.h>
+# include <sys/wait.h>
+# include <signal.h>
+# include <sys/stat.h>
+# include <dirent.h>
+# include <string.h>
+# include <sys/ioctl.h>
+# include <termios.h>
+# include <curses.h>
 
-
-typedef	struct	t_test_struct
+typedef enum
 {
-	bool						leftpipe;
-	bool						rightpipe;
-	bool						builtin;
-	t_command					*simple_command;
-	struct t_test_struct		*next;
-}		t_command_table;
+	TOKEN_COMMAND,
+	TOKEN_FILENAME,
+	TOKEN_ARGUMENT,
+	TOKEN_SINGLE_QUOTE,
+	TOKEN_DOUBLE_QUOTE,
+	TOKEN_PIPE,
+	TOKEN_VARIABLE,
+	TOKEN_REDIRECT_IN,
+	TOKEN_REDIRECT_OUT,
+	TOKEN_REDIRECT_OUT_APPEND,
+	TOKEN_HEREDOC,
+	TOKEN_DELIMITER,
+	TOKEN_STRING,
+	TOKEN_UNKNOWN
+}	token_type;
 
-typedef struct t_minishell
+typedef struct t_tokenizer
 {
-	t_command_table	*table;
-	char			**env;
-	char			**var_lst;
-}		t_minishell;
+	char				*content;
+	token_type			token;
+	struct t_tokenizer	*next;
+}		t_tokens;
 
-char		**copy_env(char **envp);
-t_minishell	*init_mini_vars(char *envp[]);
+
+
+void		process_input(char *line);
+bool    	ft_isspace(char index);
+char    	*get_next_token(char *line, int *quote_type);
+char		*ft_strndup(char *s1, size_t len);
+void		set_quote_type(int *quote_type, char quote);
+token_type	identify_token(char *token, int quote_type);
+void		add_token_to_lst(t_tokens **list_head,char *content, token_type token);
+t_tokens	*create_new_node(char *content, token_type token);
+char		*print_token(token_type token);
 
 #endif

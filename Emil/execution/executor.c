@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 11:41:14 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/03 14:25:31 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/03 15:12:46 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,26 +82,4 @@ void	mini_main(t_minishell *minishell)
 		}
 		minishell->table = minishell->table->next;
 	}
-}
-
-char	**copy_env(char **envp)
-{
-	char	**cpy;
-	int		i;
-	size_t	size;
-
-	i = 0;
-	size = 0;
-	while (envp[i] != NULL)
-		i++;
-	cpy = malloc(sizeof(char *) * (i + 1));
-	cpy[i] = NULL;
-	i = 0;
-	while (envp[i] != NULL)
-	{
-		size = ft_strlen(envp[i]);
-		cpy[i] = ft_strdup(envp[i]);
-		i++;
-	}
-	return (cpy);
 }

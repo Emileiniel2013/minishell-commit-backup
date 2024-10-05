@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 15:24:36 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/03 14:25:36 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/05 14:52:34 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ void	handle_echo(t_minishell *minishell)  // echo only prints it's own arguments
 		printf("\n");
 	else
 	{
-		if (command_cpy->token == TOKEN_ARGUMENT)
+		if (ft_strncmp(command_cpy->content, "-n", ft_strlen(command_cpy->content)) == 0)
 		{
 			nl = false;
 			command_cpy = command_cpy->next;

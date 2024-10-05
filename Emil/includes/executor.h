@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 10:56:58 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/03 15:17:33 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/03 15:25:50 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 
 # define EXECUTOR_H
 
-# include "parser.h"
 # include "lexer.h"
+# include "parser.h"
 
 void	executor(t_minishell *minishell);
 void	handle_echo(t_minishell *minishell);
