@@ -6,7 +6,7 @@
 /*   By: tndreka <tndreka@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/20 16:16:58 by tndreka           #+#    #+#             */
-/*   Updated: 2024/10/02 17:58:23 by tndreka          ###   ########.fr       */
+/*   Updated: 2024/10/05 15:36:03 by tndreka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 void prompt(t_msh *msh)
 {
 	char	*prompt;
-	t_token *tokens;
+	t_lexer *tokens;
 	size_t i = 0;
 	if (!isatty(STDIN_FILENO))
  		return ;
@@ -33,14 +33,14 @@ void prompt(t_msh *msh)
 			perror("Failed initializing prompt");
 			break ;
 		}
-		// if(ft_strncmp(prompt, "env", 4) == 0) // print the env 
-		// {
-		// 	while (msh->env[i])
-		// 	{
-		// 		printf("%s\n", msh->env[i]);
-		// 		i++;
-		// 	}
-		// }
+		if(ft_strncmp(prompt, "env", 4) == 0) // print the env 
+		{
+			while (msh->env[i])
+			{
+				printf("%s\n", msh->env[i]);
+				i++;
+			}
+		}
 		if(ft_strncmp(prompt, "exit", 4) == 0)
 		{
 			free(prompt); // free the exit part
@@ -48,8 +48,14 @@ void prompt(t_msh *msh)
 		}
 		if (*prompt)
 			add_history(prompt);
-		tokens = lexing(prompt);
+		tokens = lexer(prompt);
 		//free tokens
+		if(tokens)
+		{
+			print_token(tokens);
+			free_token(tokens);
+		}
+		
 		free(prompt);
 	}
 }

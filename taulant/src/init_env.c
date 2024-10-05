@@ -6,13 +6,17 @@
 /*   By: tndreka <tndreka@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/24 19:47:06 by tndreka           #+#    #+#             */
-/*   Updated: 2024/09/25 18:32:45 by tndreka          ###   ########.fr       */
+/*   Updated: 2024/10/05 12:37:50 by tndreka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/mini_sh.h"
 
-//This function creates the enviroment of the minishell
+/* This function creates a copy of all enviroment
+	variables. The function takes the original
+	copy of the Enviroment Variables and return a copy
+	of it. 
+*/
 
 char **create_env(char **envp)
 {
