@@ -6,7 +6,7 @@
 /*   By: tndreka <tndreka@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 10:48:48 by tndreka           #+#    #+#             */
-/*   Updated: 2024/09/30 14:04:58 by tndreka          ###   ########.fr       */
+/*   Updated: 2024/10/05 12:35:28 by tndreka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,22 +26,10 @@
 ***		pipes
 ***		enviroment variables
 ***		$ -> handle dollar sign
-***		
+***		This is the blue_print of the Minishell
 ***
 */
-//void init_shell(t_msh *msh, char *envp[]);
-// void prompt(void);
-// void prompt(void)
-// {
-// 	ft_putstr("Minishell$ ");
-// }
 
-// // void init_shell(t_msh *msh, char *envp[])
-// // {
-// // 	(void)msh;
-// // 	(void)envp;
-	
-// // }
 
 void    leaks(void)
 {

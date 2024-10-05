@@ -6,7 +6,7 @@
 /*   By: tndreka <tndreka@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 10:48:37 by tndreka           #+#    #+#             */
-/*   Updated: 2024/10/04 18:30:41 by tndreka          ###   ########.fr       */
+/*   Updated: 2024/10/05 12:55:28 by tndreka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ typedef struct s_lexer
 }	t_lexer;
 
 /*
-	TOKEN STRUCT
+	LEXING STRUCT
 */
 typedef struct s_token
 {
@@ -76,7 +76,13 @@ typedef struct s_token
 	struct s_token *next;
 }	t_token;
 
-
+/*
+	PARSING STRUCT
+*/
+typedef struct s_parser
+{	
+	
+}	t_parser;
 
 
 

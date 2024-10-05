@@ -6,7 +6,7 @@
 /*   By: tndreka <tndreka@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/02 18:01:48 by tndreka           #+#    #+#             */
-/*   Updated: 2024/10/04 20:50:53 by tndreka          ###   ########.fr       */
+/*   Updated: 2024/10/05 13:59:53 by tndreka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ void add_token(t_token **tokens, t_token *new_token)
 		{
 			temp = temp->next;
 		}		
-		temp->next = new_token;
+		temp->next = new_token;	
 	}
 }
 
@@ -96,11 +96,33 @@ char *create_redir_arr(char c)
 
 void print_token(t_token *tokens)
 {
-	
+	char *str;
+	//printf("ERROR HERE\n");
 	while (tokens)
 	{
-		printf("Token : %s\n" , tokens->data);
+		//printf("ERROR HERE1\n");
+		if (tokens->type == TOKEN_WORD)
+		{
+			//printf("ERROR HERE2\n");
+			str = "WORD";
+		}
+		else if (tokens->type == TOKEN_PIPE)
+		{
+			//printf("ERROR HERE3\n");
+			str = "PIPE";
+		}
+		else if (tokens->type == TOKEN_RIDIRECTION)
+		{
+			//printf("ERROR HERE4\n");
+			str = "RIDIRECTION";
+		}
+		else
+		{
+			//printf("ERROR HERE5\n");
+			str = "UNKNOWN";
+		}
+		//printf("ERROR HERE666\n");
+		printf("Token : %s  Type: %s\n" , tokens->data, str);
 		tokens = tokens->next;
-			
 	}
 }

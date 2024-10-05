@@ -6,7 +6,7 @@
 /*   By: tndreka <tndreka@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/02 17:41:30 by tndreka           #+#    #+#             */
-/*   Updated: 2024/10/04 18:15:24 by tndreka          ###   ########.fr       */
+/*   Updated: 2024/10/05 14:01:47 by tndreka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,7 @@
 
 /*
 	lexer()
-	this function loops through the input from 
-	readlibe(), and 
+	t
 */
 
 t_token *lexer(char *prompt)
@@ -33,11 +32,13 @@ t_token *lexer(char *prompt)
 		if(prompt[i] == '|')
 		{
 			current = create_tok("|", TOKEN_PIPE);
+			add_token(&head, current);
 			i++;
 		}
 		else if (prompt[i] == '>' || prompt[i] == '<')
 		{
 			current = create_tok(create_redir_arr(prompt[i]), TOKEN_RIDIRECTION);
+			add_token(&head, current);
 			i++;
 		}
 		else if (prompt[i])
@@ -58,12 +59,8 @@ t_token *lexer(char *prompt)
 			ft_strncpy(buffer, prompt + (i - len) , len);
 			buffer[len] = '\0';
 			current = create_tok(buffer, TOKEN_WORD);
+			add_token(&head, current);
 			free(buffer);
-		}
-		if (current)
-		{
-			current->next = head;
-			head = current;
 		}
 	}
 	return head;	

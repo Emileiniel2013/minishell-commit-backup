@@ -6,7 +6,7 @@
 /*   By: tndreka <tndreka@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/20 16:16:58 by tndreka           #+#    #+#             */
-/*   Updated: 2024/10/04 20:50:31 by tndreka          ###   ########.fr       */
+/*   Updated: 2024/10/05 13:00:03 by tndreka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,16 +57,5 @@ void prompt(t_msh *msh)
 		}
 		
 		free(prompt);
-	}
-}
-
-void print_token(t_token *tokens)
-{
-	
-	while (tokens)
-	{
-		printf("Token : %s\n" , tokens->data);
-		tokens = tokens->next;
-			
 	}
 }
