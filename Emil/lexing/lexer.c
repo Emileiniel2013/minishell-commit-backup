@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 14:43:06 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/05 17:00:18 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/07 13:49:19 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ char    *get_next_token(char *line, int *quote_type)
 		{
 			printf("Synthax error: unmatched quote character\n");
 			index = 0;
-			return (NULL);
+			return (NULL); // TODO: ERROR HANDLING
 		}
 	}
 	else
@@ -59,7 +59,7 @@ char    *get_next_token(char *line, int *quote_type)
 
 
 
-void		process_input(char *line)
+t_tokens	*process_input(char *line)
 {
     t_tokens    *token_lst_head;
     char        *content;
@@ -76,9 +76,5 @@ void		process_input(char *line)
 		free(content);
 		content = get_next_token(line, &quote_type);
 	}
-	while (token_lst_head != NULL)
-	{
-		printf("\nToken content: %s\nToken type:%s\n", token_lst_head->content, print_token(token_lst_head->token));
-		token_lst_head = token_lst_head->next;
-	}
+	return(token_lst_head);
 }

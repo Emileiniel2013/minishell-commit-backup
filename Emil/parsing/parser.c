@@ -6,26 +6,26 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 14:43:06 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/03 15:27:25 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/08 13:00:30 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/parser.h"
 
-t_minishell	*init_mini_vars(char *envp[])
+void	parse_input(char *line, t_minishell *minishell)
 {
-	t_minishell			*minishell;
-	t_command_table		*table;
-	char				**envp_cpy;
+	t_tokens		*token_lst;
+	t_command_table	*table;
+	int				i;
+
+	i = 0;
+	table = NULL;
+	token_lst = process_input(line);
+	while (token_lst != NULL)
+	{
+		if (token_lst->token == TOKEN_STRING || token_lst->token == TOKEN_DOUBLE_QUOTE)
+			expand_env_vars(&token_lst->content, minishell, token_lst->token);
+		token_lst = token_lst->next;
+	}
 	
-	minishell = malloc(sizeof(t_minishell));
-	table = malloc(sizeof(t_command_table));
-	envp_cpy = copy_env(envp);
-	minishell->table = table;
-	minishell->env = envp_cpy;
-	minishell->table->leftpipe = false;
-	minishell->table->rightpipe = false;
-	minishell->table->builtin = false;
-	minishell->var_lst = NULL;
-	return (minishell);
 }

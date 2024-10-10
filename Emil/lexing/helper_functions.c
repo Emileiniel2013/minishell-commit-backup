@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 15:13:00 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/05 17:12:12 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/08 12:59:56 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ char    *ft_strndup(char *s1, size_t len)
 	j = 0;
 	cpy = (char *)malloc(sizeof(char) * (len + 1));
 	if (!cpy)
-		return (NULL);
+		return (NULL); // TODO ERROR HANDLING
 	while (s1[j] && j < len)
 	{
 		cpy[j] = s1[j];
@@ -60,8 +60,6 @@ token_type	identify_token(char *token, int quote_type)
 		return (TOKEN_REDIRECT_OUT);
 	else if (ft_strncmp(token, ">>", ft_strlen(token)) == 0)
 		return (TOKEN_REDIRECT_OUT_APPEND);
-	else if (ft_strncmp(token, "$", 1) == 0)
-		return (TOKEN_VARIABLE);
 	else if (ft_strncmp(token, "<<", ft_strlen(token)) == 0)
 		return (TOKEN_HEREDOC);
 	else
@@ -92,7 +90,7 @@ t_tokens	*create_new_node(char *content, token_type token)
 {
 	t_tokens	*new_token;
 
-	new_token = malloc(sizeof(t_tokens));
+	new_token = malloc(sizeof(t_tokens)); // TODO ERROR HANDLING
 	new_token->content = ft_strdup(content);
 	new_token->token = token;
 	new_token->next = NULL;
@@ -109,7 +107,6 @@ char	*print_token(token_type token)
 		case TOKEN_REDIRECT_IN : return ("TOKEN_REDIRECT_IN");
 		case TOKEN_REDIRECT_OUT : return ("TOKEN_REDIRECT_OUT");
 		case TOKEN_REDIRECT_OUT_APPEND : return ("TOKEN_REDIRECT_OUT_APPEND");
-		case TOKEN_VARIABLE : return ("TOKEN_VARIABLE");
 		case TOKEN_HEREDOC : return ("TOKEN_HEREDOC");
 		case TOKEN_STRING : return ("TOKEN_STRING");
 		case TOKEN_COMMAND : return ("TOKEN_COMMAND");

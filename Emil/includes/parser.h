@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 13:32:53 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/05 13:32:35 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/08 13:01:09 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,10 @@ typedef struct t_minishell
 	char			**var_lst;
 }		t_minishell;
 
-char		**copy_env(char **envp);
-t_minishell	*init_mini_vars(char *envp[]);
+char	**copy_env(char **envp);
+void	parse_input(char *line, t_minishell *minishell);
+void	expand_env_vars(char **content, t_minishell *minishell, token_type token);
+char	*ft_getenv(t_minishell *minishell, char	*env);
+char	*check_quoted_string(char **content, t_minishell *minishell);
 
 #endif

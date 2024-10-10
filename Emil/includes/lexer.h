@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 13:27:42 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/05 17:06:04 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/08 12:59:42 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ typedef enum
 	TOKEN_SINGLE_QUOTE,
 	TOKEN_DOUBLE_QUOTE,
 	TOKEN_PIPE,
-	TOKEN_VARIABLE,
 	TOKEN_REDIRECT_IN,
 	TOKEN_REDIRECT_OUT,
 	TOKEN_REDIRECT_OUT_APPEND,
@@ -53,7 +52,7 @@ typedef struct t_tokenizer
 
 
 
-void		process_input(char *line);
+t_tokens	*process_input(char *line);
 bool    	ft_isspace(char index);
 char    	*get_next_token(char *line, int *quote_type);
 char		*ft_strndup(char *s1, size_t len);

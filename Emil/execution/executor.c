@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 11:41:14 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/03 15:12:46 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/08 13:02:05 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,10 @@ void	executor(t_minishell *minishell)
 			handle_unset(minishell);
 		else if ((ft_strncmp (minishell->table->simple_command->content, "./", 2)) == 0)
 			execute_file(minishell);
+		else if (ft_strchr(minishell->table->simple_command->content + 1, "=") != NULL)
+			add_var_to_list(minishell);
+		else if (minishell->table->simple_command->content[0] == '\0')
+			printf("\n");
 		else
 			check_path(minishell);
 	}
