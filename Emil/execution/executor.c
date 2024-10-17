@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 11:41:14 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/17 12:46:58 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/17 16:07:12 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,11 +44,11 @@ void	executor(t_minishell *minishell)
 
 void	mini_main(t_minishell *minishell)
 {
-	int					pipefd[2];
-	int					prevpipefd[2];
-	int					pid;
+	int	pipefd[2];
+	int	prevpipefd;
+	int	pid;
 
-	prevpipefd[0] = -1;
+	prevpipefd = -1;
 	while(minishell->table != NULL)
 	{
 		if (minishell->table->rightpipe == true)
@@ -58,58 +58,31 @@ void	mini_main(t_minishell *minishell)
 		{
 			if (minishell->table->leftpipe == true)
 			{
-				ft_putendl_fd(ft_itoa(prevpipefd[0]), 2);
-				ft_putendl_fd(ft_itoa(prevpipefd[1]), 2);
-				dup2(prevpipefd[0], STDIN_FILENO);
-				if (prevpipefd[1] > 2)
-					close(prevpipefd[1]);
-				if (prevpipefd[0] > 2)
-					close(prevpipefd[0]);
-				ft_putendl_fd("left", 2);
+				dup2(prevpipefd, STDIN_FILENO);
+				close(prevpipefd);
 			}
+			else if (!minishell->table->leftpipe && minishell->in_redir)
+				dup2(minishell->infd, STDIN_FILENO);
 			if (minishell->table->rightpipe == true)
 			{
-				ft_putendl_fd(ft_itoa(pipefd[0]), 2);
-				ft_putendl_fd(ft_itoa(pipefd[1]), 2);
-				ft_putendl_fd("right", 2);
 				dup2(pipefd[1], STDOUT_FILENO);
-				if (pipefd[0] > 2)
-					close(pipefd[0]);
-				if (pipefd[1] > 2)
-					close(pipefd[1]);
+				close(pipefd[0]);
+				close(pipefd[1]);
 			}
+			else if (!minishell->table->rightpipe && minishell->out_redir)
+				dup2(minishell->outfd, STDOUT_FILENO);
 			executor(minishell);
 			exit(EXIT_SUCCESS);
 		}
-		else
+		waitpid(pid, NULL, 0);
+		if (minishell->table->leftpipe)
+			close(prevpipefd);
+		if (minishell->table->rightpipe)
 		{
-			waitpid(pid, NULL, 0);
-			if (minishell->table->leftpipe)
-			{
-				if (prevpipefd[0] > 2)
-					close(prevpipefd[0]);
-				prevpipefd[0] = -2;
-				if (prevpipefd[1] > 2)
-					close(prevpipefd[1]);
-				prevpipefd[1] = -2;
-			}
-			if (minishell->table->rightpipe == true)
-			{
-				prevpipefd[0] = pipefd[0];
-				if (pipefd[1] > 2)
-					close(pipefd[1]);
-				pipefd[1] = -2;
-			}
+			prevpipefd = pipefd[0];
+			close(pipefd[1]);
 		}
 		minishell->table = minishell->table->next;
 	}
-	if (prevpipefd[0] != -1)
-	{
-		if (prevpipefd[0] > 2)
-			close(prevpipefd[0]);
-		if (prevpipefd[1] > 2)
-			close(prevpipefd[1]);
-	}
-	if (pipefd[0] > 2)
-		close(pipefd[0]);
+	close(pipefd[0]);
 }

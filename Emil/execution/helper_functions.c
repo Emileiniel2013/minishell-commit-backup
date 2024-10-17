@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 15:36:41 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/11 20:20:59 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/17 16:33:04 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -211,9 +211,9 @@ int	handle_redirections(t_minishell *minishell)
 		if (fd < 0)
 		{
 			printf ("Minishell: %s: No such file or directory\n", minishell->in_redir);
+			minishell->infd = fd;
 			return (-1);
 		}
-		dup2(fd, STDIN_FILENO);
 		minishell->infd = fd;
 	}
 	if (minishell->out_redir)
@@ -225,6 +225,7 @@ int	handle_redirections(t_minishell *minishell)
 		if (fd < 0)
 		{
 			printf("Minishell: Error opening output file\n");
+			minishell->outfd = fd;
 			return (-1);
 		}
 		minishell->outfd = fd;
@@ -236,15 +237,16 @@ void	restore_redirections(t_minishell *minishell)
 {
 	if (minishell->in_redir)
 	{
-		dup2(minishell->infd, STDIN_FILENO);
 		close(minishell->infd);
 		minishell->infd = STDIN_FILENO;
+		free(minishell->in_redir);
+		minishell->in_redir = NULL;
 	}
 	if (minishell->out_redir)
 	{
-		dup2(minishell->outfd, STDOUT_FILENO);
 		close(minishell->outfd);
 		minishell->outfd = STDOUT_FILENO;
+		free(minishell->out_redir);
+		minishell->out_redir = NULL;
 	}
 }
-

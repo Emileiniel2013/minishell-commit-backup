@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/02 17:50:07 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/17 12:28:42 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/17 15:59:25 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,24 +33,21 @@ int	main(int argc, char *argv[], char *envp[])
 	while(1)
 	{
 		line = readline("Minishell $ ");
-		if (line == NULL)
-			break;
 		if (line && line[0] != '\0')
 		{
 			add_history(line);
 			parse_input(line, minishell);
 			if (minishell->table)
 			{
-				// if (handle_redirections(minishell) != -1)
-				// {
+				if (handle_redirections(minishell) != -1)
+				{
 					if (!minishell->table->rightpipe && check_builtin(minishell))
-					{
 						executor(minishell);
-					}
 					else
 						mini_main(minishell);
-				// } // ELSE DESTROY AND FREE EVERYTHING !!!
+				} // ELSE DESTROY AND FREE EVERYTHING !!!
 			}
+			restore_redirections(minishell);
 		}
 	}
 	return (0);
