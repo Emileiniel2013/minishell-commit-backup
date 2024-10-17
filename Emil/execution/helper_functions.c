@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 15:36:41 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/09 18:04:50 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/11 20:20:59 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,7 +172,7 @@ char	*ft_check_var_lst(t_minishell *minishell, char *var)
 void	add_var_to_list(t_minishell *minishell)
 {
 	int		i;
-	char	*var_lst;
+	char	**var_lst;
 
 	i = 0;
 	while (minishell->var_lst)
@@ -200,3 +200,51 @@ void	add_var_to_list(t_minishell *minishell)
 		minishell->var_lst = var_lst;
 	}
 }
+
+int	handle_redirections(t_minishell *minishell)
+{
+	int	fd;
+
+	if (minishell->in_redir)
+	{
+		fd = open(minishell->in_redir, O_RDONLY);
+		if (fd < 0)
+		{
+			printf ("Minishell: %s: No such file or directory\n", minishell->in_redir);
+			return (-1);
+		}
+		dup2(fd, STDIN_FILENO);
+		minishell->infd = fd;
+	}
+	if (minishell->out_redir)
+	{
+		if (minishell->append_mode == TRUE)
+			fd = open(minishell->out_redir, O_WRONLY | O_CREAT | O_APPEND, 0644);
+		else
+			fd = open(minishell->out_redir, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		if (fd < 0)
+		{
+			printf("Minishell: Error opening output file\n");
+			return (-1);
+		}
+		minishell->outfd = fd;
+	}
+	return (0);
+}
+
+void	restore_redirections(t_minishell *minishell)
+{
+	if (minishell->in_redir)
+	{
+		dup2(minishell->infd, STDIN_FILENO);
+		close(minishell->infd);
+		minishell->infd = STDIN_FILENO;
+	}
+	if (minishell->out_redir)
+	{
+		dup2(minishell->outfd, STDOUT_FILENO);
+		close(minishell->outfd);
+		minishell->outfd = STDOUT_FILENO;
+	}
+}
+

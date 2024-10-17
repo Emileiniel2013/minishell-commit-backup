@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 10:56:58 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/08 13:01:33 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/11 19:01:04 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 
 # include "lexer.h"
 # include "parser.h"
+# include <fcntl.h>
 
 void	executor(t_minishell *minishell);
 void	handle_echo(t_minishell *minishell);
@@ -34,5 +35,8 @@ char	*ft_getcwd(t_minishell *minishell);
 char	**create_arg_lst(t_minishell *minishell);
 char	*ft_check_var_lst(t_minishell *minishell, char *var);
 void	add_var_to_list(t_minishell *minishell);
+void    mini_main(t_minishell *minishell);
+int		handle_redirections(t_minishell *minishell);
+void	restore_redirections(t_minishell *minishell);
 
 #endif

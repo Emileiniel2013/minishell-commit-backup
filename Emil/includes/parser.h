@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 13:32:53 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/08 13:01:09 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/11 18:47:50 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,6 @@ typedef	struct	t_test_struct
 {
 	bool						leftpipe;
 	bool						rightpipe;
-	bool						builtin;
 	t_command					*simple_command;
 	struct t_test_struct		*next;
 }		t_command_table;
@@ -37,6 +36,11 @@ typedef struct t_minishell
 	t_command_table	*table;
 	char			**env;
 	char			**var_lst;
+	char			*out_redir;
+	int				outfd;
+	char			*in_redir;
+	int				infd;
+	bool			append_mode;
 }		t_minishell;
 
 char	**copy_env(char **envp);
@@ -44,5 +48,10 @@ void	parse_input(char *line, t_minishell *minishell);
 void	expand_env_vars(char **content, t_minishell *minishell, token_type token);
 char	*ft_getenv(t_minishell *minishell, char	*env);
 char	*check_quoted_string(char **content, t_minishell *minishell);
+int		check_valid_redir_input(t_tokens **token_lst, t_minishell *minishell);
+int		check_valid_pipe(t_tokens *token_lst, t_command_table *table);
+void	add_token_to_table(t_command_table **table, t_tokens *token_lst);
+void	add_cmd_node(t_command **cmd, char *content);
+bool    check_builtin(t_minishell *minishell);
 
 #endif

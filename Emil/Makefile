@@ -6,13 +6,13 @@
 #    By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/02 11:51:28 by temil-da          #+#    #+#              #
-#    Updated: 2024/10/05 14:56:19 by temil-da         ###   ########.fr        #
+#    Updated: 2024/10/17 12:09:31 by temil-da         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = minishell
 
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -g3
 
 LFLAGS =  -lreadline -lcurses
 

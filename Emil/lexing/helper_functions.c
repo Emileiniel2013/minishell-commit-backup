@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 15:13:00 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/08 12:59:56 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/11 17:43:06 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ void	set_quote_type(int *quote_type, char quote)
 token_type	identify_token(char *token, int quote_type)
 {
 	if (quote_type == 1)
-		return (TOKEN_SINGLE_QUOTE);
+		return (TOKEN_STRING);
 	else if (quote_type == 2)
 		return (TOKEN_DOUBLE_QUOTE);
 	else if (ft_strncmp(token, "|", ft_strlen(token)) == 0)
@@ -68,8 +68,9 @@ token_type	identify_token(char *token, int quote_type)
 
 void	add_token_to_lst(t_tokens **list_head,char *content, token_type token)
 {
-	t_tokens	*new_token;
-	t_tokens	*current;
+	t_tokens			*new_token;
+	t_tokens			*current;
+
 
 	new_token = create_new_node(content, token);
 	current = NULL;

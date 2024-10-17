@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 14:43:06 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/07 13:49:19 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/11 17:37:49 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ char    *get_next_token(char *line, int *quote_type)
 	int			start;
     char		*token;
 	char		quote;
-	
+
 	start = index;
 	token = NULL;
 	quote = '\0';
@@ -39,9 +39,9 @@ char    *get_next_token(char *line, int *quote_type)
 		}
 		else
 		{
-			printf("Synthax error: unmatched quote character\n");
+			printf("Minishell: synthax error: unmatched quote character\n");
 			index = 0;
-			return (NULL); // TODO: ERROR HANDLING
+			return ("\0");
 		}
 	}
 	else
@@ -69,12 +69,16 @@ t_tokens	*process_input(char *line)
 	token_lst_head = NULL;
 	quote_type = 0;
 	content = get_next_token(line, &quote_type);
+	if (content && content[0] == '\0')
+		return (NULL); // TODO / FREE EVERYTHING / GO BACK TO 0
 	while (content != NULL)
 	{
 		type = identify_token(content, quote_type);
 		add_token_to_lst(&token_lst_head, content, type);
 		free(content);
 		content = get_next_token(line, &quote_type);
+		if (content && content[0] == '\0')
+			return (NULL); // TODO / FREE EVERYTHING / GO BACK TO 0
 	}
 	return(token_lst_head);
 }
