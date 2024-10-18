@@ -6,7 +6,7 @@
 /*   By: tndreka <tndreka@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 10:48:37 by tndreka           #+#    #+#             */
-/*   Updated: 2024/10/05 15:46:10 by tndreka          ###   ########.fr       */
+/*   Updated: 2024/10/11 17:37:34 by tndreka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@
 
 //=========== STRUCTS =====================
 
-typedef enum s_token{
+typedef enum e_token {
 	TOKEN_COMMAND,
 	TOKEN_ARGUMENT,
 	TOKEN_WORD,
@@ -44,6 +44,8 @@ typedef enum s_token{
 	TOKEN_RIDIRECTION_LESS_LESS, 	
 	TOKEN_RIDIRECTION_GREAT, 	
 	TOKEN_RIDIRECTION_GREAT_GREAT,
+	TOKEN_SINGLE_QUOTE,
+	TOKEN_DOUBLE_QUOTE,
 	TOKEN_UNKNOWN
 }	t_token;
 
@@ -62,6 +64,25 @@ typedef struct s_comands
 /*
 	LEXING STRUCT
 */
+
+/*
+	EXECUTION 
+typedef struct s_redirect {
+	char *data;
+	e_token type;
+}
+
+typedef struct s_runconfig {
+	char *cmd;
+	int argc;
+	char **args;
+	t_list *redirect;
+	struct s_runconfig* pipe;
+}
+
+*/
+
+
 typedef struct s_lexer
 {
 	char				*data;
@@ -74,9 +95,13 @@ typedef struct s_lexer
 */
 typedef struct s_parser
 {
-		
+	t_lexer *list;
 }	t_parser;
 
+typedef struct t_parstool
+{
+	
+} t_parstool;
 
 
 /* === MINISHELL STRUCT ===*/
@@ -89,6 +114,9 @@ typedef struct s_msh
 {
 	char **env;
 	char *input;
+	t_comands *comands;
+	t_lexer	  *list;
+	t_token type;
 }	t_msh;
 
 //loop
@@ -116,4 +144,6 @@ t_lexer *lexer(char *prompt);
 void free_token(t_lexer *head);
 
 void print_token(t_lexer *tokens);
+
+char *handle_quote(char *start);
 #endif
