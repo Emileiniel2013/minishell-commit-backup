@@ -6,11 +6,11 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 15:24:36 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/02 15:50:57 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/11 18:12:51 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/executor.h"
+#include "../includes/executor.h"
 
 void	handle_echo(t_minishell *minishell)  // echo only prints it's own arguments it does not process input from the pipe, but it can redirect it to other commands
 {
@@ -24,7 +24,7 @@ void	handle_echo(t_minishell *minishell)  // echo only prints it's own arguments
 		printf("\n");
 	else
 	{
-		if (command_cpy->token == TOKEN_ARGUMENT)
+		if (ft_strncmp(command_cpy->content, "-n", ft_strlen(command_cpy->content)) == 0)
 		{
 			nl = false;
 			command_cpy = command_cpy->next;
@@ -75,7 +75,7 @@ void	handle_cd(t_minishell *minishell)
 	char	*path;
 	char	cwd[1024];
 
-	if (minishell->table->next == NULL)
+	if (minishell->table->simple_command->next == NULL)
 	{
 		path = ft_getenv(minishell, "HOME");
 		if (!path)
@@ -202,7 +202,8 @@ void	check_path(t_minishell *minishell)
 	path = NULL;
 	while (paths[i] != NULL)
 	{
-		path = ft_strjoin(paths[i], minishell->table->simple_command->content);
+		path = ft_strjoin(paths[i], "/");
+		path = ft_strjoin(path, minishell->table->simple_command->content);
 		if (access(path, X_OK) == 0)
 		{
 			valid_cmd = true;

@@ -6,11 +6,11 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 15:36:41 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/02 15:46:00 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/17 16:33:04 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/executor.h"
+#include "../includes/executor.h"
 
 void	replace_env(t_minishell *minishell, char *path)
 {
@@ -111,25 +111,6 @@ char	*ft_getcwd(t_minishell *minishell)
 	return (NULL);
 }
 
-char	*ft_getenv(t_minishell *minishell, char	*env)
-{
-	size_t	i;
-	int		len;
-	char	*var;
-
-	len = ft_strlen(env);
-	i = -1;
-	while(minishell->env[++i])
-	{
-		if(ft_strncmp(minishell->env[i], env, len) == 0 && minishell->env[i][len] == '=')
-		{
-			var = ft_strdup(minishell->env[i] + len + 1);
-			return (var);
-		}
-	}
-	return (NULL);
-}
-
 char	**create_arg_lst(t_minishell *minishell)
 {
 	int			i;
@@ -186,4 +167,86 @@ char	*ft_check_var_lst(t_minishell *minishell, char *var)
 		}
 	}
 	return (new_var);
+}
+
+void	add_var_to_list(t_minishell *minishell)
+{
+	int		i;
+	char	**var_lst;
+
+	i = 0;
+	while (minishell->var_lst)
+		i++;
+	if (i == 0)
+	{
+		var_lst = malloc(sizeof(char *) * 2);
+		var_lst[0] = ft_strdup(minishell->table->simple_command->content);
+		var_lst[1] = NULL;
+		minishell->var_lst = var_lst;
+	}
+	else
+	{
+		var_lst = malloc(sizeof(char *) * (i + 2));
+		var_lst[i + 1] = NULL;
+		var_lst[i] = ft_strdup(minishell->table->simple_command->content);
+		while (--i >= 0)
+			var_lst[i] = ft_strdup(minishell->var_lst[i]);
+		while (minishell->var_lst[i])
+		{
+			free(minishell->var_lst[i]);
+			i++;
+		}
+		free(minishell->var_lst);
+		minishell->var_lst = var_lst;
+	}
+}
+
+int	handle_redirections(t_minishell *minishell)
+{
+	int	fd;
+
+	if (minishell->in_redir)
+	{
+		fd = open(minishell->in_redir, O_RDONLY);
+		if (fd < 0)
+		{
+			printf ("Minishell: %s: No such file or directory\n", minishell->in_redir);
+			minishell->infd = fd;
+			return (-1);
+		}
+		minishell->infd = fd;
+	}
+	if (minishell->out_redir)
+	{
+		if (minishell->append_mode == TRUE)
+			fd = open(minishell->out_redir, O_WRONLY | O_CREAT | O_APPEND, 0644);
+		else
+			fd = open(minishell->out_redir, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		if (fd < 0)
+		{
+			printf("Minishell: Error opening output file\n");
+			minishell->outfd = fd;
+			return (-1);
+		}
+		minishell->outfd = fd;
+	}
+	return (0);
+}
+
+void	restore_redirections(t_minishell *minishell)
+{
+	if (minishell->in_redir)
+	{
+		close(minishell->infd);
+		minishell->infd = STDIN_FILENO;
+		free(minishell->in_redir);
+		minishell->in_redir = NULL;
+	}
+	if (minishell->out_redir)
+	{
+		close(minishell->outfd);
+		minishell->outfd = STDOUT_FILENO;
+		free(minishell->out_redir);
+		minishell->out_redir = NULL;
+	}
 }

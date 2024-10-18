@@ -6,14 +6,17 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 11:41:14 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/02 17:49:50 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/17 16:07:12 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/executor.h"
+#include "../includes/executor.h"
 
 void	executor(t_minishell *minishell)
 {
+	int	i;
+
+	i = 0;
 	if (minishell->table != NULL)
 	{
 		if (ft_strncmp(minishell->table->simple_command->content, "echo", 4) == 0)
@@ -30,6 +33,10 @@ void	executor(t_minishell *minishell)
 			handle_unset(minishell);
 		else if ((ft_strncmp (minishell->table->simple_command->content, "./", 2)) == 0)
 			execute_file(minishell);
+		else if (ft_strchr(minishell->table->simple_command->content + 1, '=') != NULL)
+			add_var_to_list(minishell);
+		else if (minishell->table->simple_command->content[0] == '\0')
+			printf("\n");
 		else
 			check_path(minishell);
 	}
@@ -37,10 +44,11 @@ void	executor(t_minishell *minishell)
 
 void	mini_main(t_minishell *minishell)
 {
-	int					pipefd[2];
-	int					prevpipefd[2];
-	int					pid;
+	int	pipefd[2];
+	int	prevpipefd;
+	int	pid;
 
+	prevpipefd = -1;
 	while(minishell->table != NULL)
 	{
 		if (minishell->table->rightpipe == true)
@@ -50,58 +58,31 @@ void	mini_main(t_minishell *minishell)
 		{
 			if (minishell->table->leftpipe == true)
 			{
-				dup2(prevpipefd[0], STDIN_FILENO);
-				close(prevpipefd[0]);
-				close(prevpipefd[1]);
+				dup2(prevpipefd, STDIN_FILENO);
+				close(prevpipefd);
 			}
+			else if (!minishell->table->leftpipe && minishell->in_redir)
+				dup2(minishell->infd, STDIN_FILENO);
 			if (minishell->table->rightpipe == true)
 			{
-				dup2(pipefd[1], minishell->std_out_fd);
-				close(pipefd[1]);
+				dup2(pipefd[1], STDOUT_FILENO);
 				close(pipefd[0]);
+				close(pipefd[1]);
 			}
+			else if (!minishell->table->rightpipe && minishell->out_redir)
+				dup2(minishell->outfd, STDOUT_FILENO);
 			executor(minishell);
 			exit(EXIT_SUCCESS);
 		}
-		else
+		waitpid(pid, NULL, 0);
+		if (minishell->table->leftpipe)
+			close(prevpipefd);
+		if (minishell->table->rightpipe)
 		{
-			waitpid(pid, NULL, 0);
-			if (minishell->table->leftpipe == true)
-			{
-				close(prevpipefd[0]);
-				close(prevpipefd[1]);
-			}
+			prevpipefd = pipefd[0];
 			close(pipefd[1]);
-			if (minishell->table->rightpipe == true)
-			{
-				prevpipefd[0] = pipefd[0];
-				prevpipefd[1] = pipefd[1];
-			}
-			else
-				close(pipefd[0]);
 		}
 		minishell->table = minishell->table->next;
 	}
-}
-
-char	**copy_env(char **envp)
-{
-	char	**cpy;
-	int		i;
-	size_t	size;
-
-	i = 0;
-	size = 0;
-	while (envp[i] != NULL)
-		i++;
-	cpy = malloc(sizeof(char *) * (i + 1));
-	cpy[i] = NULL;
-	i = 0;
-	while (envp[i] != NULL)
-	{
-		size = ft_strlen(envp[i]);
-		cpy[i] = ft_strdup(envp[i]);
-		i++;
-	}
-	return (cpy);
+	close(pipefd[0]);
 }
