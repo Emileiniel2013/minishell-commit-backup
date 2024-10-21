@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 15:36:41 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/17 16:33:04 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/21 15:59:14 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,28 +29,22 @@ void	replace_env(t_minishell *minishell, char *path)
 	minishell->env[i] = ft_strjoin("PWD=", path);
 }
 
-void	free_env(t_minishell *minishell)
+void	free_arr(char **arr)
 {
 	int i;
 
 	i = 0;
-
-	while (minishell->env[i] != NULL)
-		i++;
-	while (i >= 0)
+	if (arr)
 	{
-		if (minishell->env[i])
-			free(minishell->env[i]);
-		i--;
-	}
-	free(minishell->env);
-	if (minishell->var_lst)
-	{
-		if (!minishell->var_lst[i])
+		while (arr[i] != NULL)
+			i++;
+		while (i >= 0)
 		{
-			free(minishell->var_lst);
-			minishell->var_lst = NULL;
+			if (arr[i])
+				free(arr[i]);
+			i--;
 		}
+		free(arr);
 	}
 }
 
@@ -119,7 +113,7 @@ char	**create_arg_lst(t_minishell *minishell)
 
 	i = 0;
 	arg_arr = NULL;
-	arg_lst = minishell->table->simple_command->next;
+	arg_lst = minishell->table->simple_command;
 	if (arg_lst)
 	{
 		while(arg_lst)
@@ -130,11 +124,12 @@ char	**create_arg_lst(t_minishell *minishell)
 		arg_arr = malloc (sizeof(char *) * (i + 1));
 		arg_arr[i] = NULL;
 		i = 0;
-		arg_lst = minishell->table->simple_command->next;
+		arg_lst = minishell->table->simple_command;
 		while(arg_lst)
 		{
 			arg_arr[i] = ft_strdup(arg_lst->content);
-			arg_lst = arg_lst->next;	
+			arg_lst = arg_lst->next;
+			i++;
 		}
 	}
 	return (arg_arr);
@@ -191,12 +186,7 @@ void	add_var_to_list(t_minishell *minishell)
 		var_lst[i] = ft_strdup(minishell->table->simple_command->content);
 		while (--i >= 0)
 			var_lst[i] = ft_strdup(minishell->var_lst[i]);
-		while (minishell->var_lst[i])
-		{
-			free(minishell->var_lst[i]);
-			i++;
-		}
-		free(minishell->var_lst);
+		free_arr(minishell->var_lst);
 		minishell->var_lst = var_lst;
 	}
 }
@@ -210,7 +200,9 @@ int	handle_redirections(t_minishell *minishell)
 		fd = open(minishell->in_redir, O_RDONLY);
 		if (fd < 0)
 		{
-			printf ("Minishell: %s: No such file or directory\n", minishell->in_redir);
+			write(STDERR_FILENO, "Minishell: ", 11);
+			write(STDERR_FILENO, minishell->in_redir, ft_strlen(minishell->in_redir));
+			write(STDERR_FILENO, ": No such file or directory\n", 29);
 			minishell->infd = fd;
 			return (-1);
 		}
@@ -218,13 +210,16 @@ int	handle_redirections(t_minishell *minishell)
 	}
 	if (minishell->out_redir)
 	{
-		if (minishell->append_mode == TRUE)
+		if (minishell->append_mode == true)
+		{
 			fd = open(minishell->out_redir, O_WRONLY | O_CREAT | O_APPEND, 0644);
+			minishell->append_mode = false;
+		}
 		else
 			fd = open(minishell->out_redir, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		if (fd < 0)
 		{
-			printf("Minishell: Error opening output file\n");
+			write(STDERR_FILENO, "Minishell: Error opening output file\n", 38);
 			minishell->outfd = fd;
 			return (-1);
 		}
@@ -237,16 +232,20 @@ void	restore_redirections(t_minishell *minishell)
 {
 	if (minishell->in_redir)
 	{
-		close(minishell->infd);
+		if (minishell->infd > 0)
+			close(minishell->infd);
 		minishell->infd = STDIN_FILENO;
 		free(minishell->in_redir);
 		minishell->in_redir = NULL;
 	}
 	if (minishell->out_redir)
 	{
-		close(minishell->outfd);
+		if (minishell->outfd > 0)
+			close(minishell->outfd);
 		minishell->outfd = STDOUT_FILENO;
 		free(minishell->out_redir);
 		minishell->out_redir = NULL;
 	}
+	if (open(".heredoc_tmp", O_RDONLY, 0644) > 0)
+		unlink(".heredoc_tmp");
 }

@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 15:13:00 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/11 18:23:25 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/21 16:15:10 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,16 +124,18 @@ void	expand_env_vars(char **content, t_minishell *minishell, token_type token)
 	}
 }
 
-int	check_valid_redir_input(t_tokens **token_lst, t_minishell *minishell) // I CHANGED TOKEN FROM STRING TO FILENAME AND ITS NOT WORKING ANYMORE
+int	check_valid_redir_input(t_tokens **token_lst, t_minishell *minishell)
 {
 	if ((*token_lst)->next == NULL)
 	{
-		printf("Minishell: syntax error near unexpected token `newline'\n");
+		write(STDERR_FILENO, "Minishell: syntax error near unexpected token `newline'\n", 56);
 		return (-1);
 	}
 	else if ((*token_lst)->next->token != TOKEN_STRING)
 	{
-		printf("Minishell: syntax error near unexpected token `%s'\n", (*token_lst)->next->content);
+		write(STDERR_FILENO, "Minishell: syntax error near unexpected token `", 47);
+		write(STDERR_FILENO, (*token_lst)->next->content, ft_strlen((*token_lst)->next->content));
+		write(STDERR_FILENO, "'\n", 2);
 		return (-1);
 	}
 	if ((*token_lst)->token == TOKEN_REDIRECT_IN)
@@ -159,17 +161,17 @@ int	check_valid_pipe(t_tokens *token_lst, t_command_table *table)
 {
 	if (token_lst->token == TOKEN_PIPE && (!token_lst->next || token_lst->next->token != TOKEN_STRING))
 	{
-		printf("Minishell: syntax error near unexpected token `newline'\n");
+		write(STDERR_FILENO, "Minishell: syntax error near unexpected token `newline'\n", 57);
 		return (-1);
 	}
 	if (token_lst->token == TOKEN_PIPE && !table)
 	{
-		printf("Minishell: syntax error near unexpected token `|'\n");
+		write(STDERR_FILENO, "Minishell: syntax error near unexpected token `|'\n", 51);
 		return (-1);
 	}
 	if (token_lst->token == TOKEN_PIPE && token_lst->next->token != TOKEN_STRING)
 	{
-		printf("Minishell: syntax error near unexpected token `newline'\n");
+		write(STDERR_FILENO, "Minishell: syntax error near unexpected token `newline'\n",57);
 		return (-1);
 	}
 	return (0);
@@ -241,24 +243,70 @@ void	add_cmd_node(t_command **cmd, char *content)
 
 bool    check_builtin(t_minishell *minishell)
 {
+	char	*content;
+
+	content = minishell->table->simple_command->content;
 	if (minishell->table != NULL)
 	{
-		if (ft_strncmp(minishell->table->simple_command->content, "echo", 4) == 0)
+		if (ft_strncmp(content, "echo", ft_strlen(content)) == 0)
 			return (true);
-		else if (ft_strncmp(minishell->table->simple_command->content, "pwd", 3) == 0)
+		else if (ft_strncmp(content, "pwd", ft_strlen(content)) == 0)
 			return (true);
-		else if (ft_strncmp(minishell->table->simple_command->content, "cd", 2) == 0)
+		else if (ft_strncmp(content, "cd", ft_strlen(content)) == 0)
 			return (true);
-		else if (ft_strncmp(minishell->table->simple_command->content, "env", 3) == 0)
+		else if (ft_strncmp(content, "env", ft_strlen(content)) == 0)
 			return (true);
-		else if (ft_strncmp(minishell->table->simple_command->content, "export", 6) == 0)
+		else if (ft_strncmp(content, "export", ft_strlen(content)) == 0)
 			return (true);
-		else if (ft_strncmp(minishell->table->simple_command->content, "unset", 5) == 0)
+		else if (ft_strncmp(content, "unset", ft_strlen(content)) == 0)
 			return (true);
-		else if (ft_strchr(minishell->table->simple_command->content + 1, '=') != NULL)
+		else if (ft_strchr(content + 1, '=') != NULL)
 			return (true);
 		else
 			return (false);
 		}
 	return (false);
+}
+
+int	handle_heredoc(t_tokens **token_lst, t_minishell *minishell)
+{
+	char	*delimiter;
+	char	*line;
+	int		fd;
+
+	line = NULL;
+	fd = -1;
+	if (!(*token_lst)->next)
+	{
+		write(STDERR_FILENO, "Minishell: syntax error near unexpected token 'newline'\n", 57);
+		return (-1);
+	}
+	if ((*token_lst)->next->token != TOKEN_STRING)
+	{
+		write(STDERR_FILENO, "Minishell: syntax error near unexpected token `", 47);
+		write(STDERR_FILENO, (*token_lst)->next->content, ft_strlen((*token_lst)->next->content));
+		write(STDERR_FILENO, "'\n", 3);
+		return (-1);
+	} 
+	else
+		(*token_lst)->next->token = TOKEN_DELIMITER;
+	
+	delimiter = ft_strdup((*token_lst)->next->content);
+	fd = open(".heredoc_tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (fd < 0)
+	{
+		write(STDERR_FILENO, "Minishell: Failed to create heredoc file\n", 42);
+		return (-1);
+	}
+	while (1)
+	{
+		line = readline("heredoc> ");
+		if (ft_strncmp(line, delimiter, ft_strlen(line)) == 0)
+			break ;
+		write(fd, line, strlen(line));
+		write(fd, "\n", 1);
+	}
+	minishell->in_redir = ft_strdup(".heredoc_tmp");
+	close(fd); 
+	return (0);
 }

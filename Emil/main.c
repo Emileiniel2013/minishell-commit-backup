@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/02 17:50:07 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/17 15:59:25 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/18 17:39:56 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,8 @@ int	main(int argc, char *argv[], char *envp[])
 						executor(minishell);
 					else
 						mini_main(minishell);
-				} // ELSE DESTROY AND FREE EVERYTHING !!!
-			}
+				}
+			} // ELSE DESTROY AND FREE EVERYTHING !!!
 			restore_redirections(minishell);
 		}
 	}

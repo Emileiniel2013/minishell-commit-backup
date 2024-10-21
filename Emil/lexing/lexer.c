@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 14:43:06 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/11 17:37:49 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/21 16:03:16 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ char    *get_next_token(char *line, int *quote_type)
 		}
 		else
 		{
-			printf("Minishell: synthax error: unmatched quote character\n");
+			write(STDERR_FILENO, "Minishell: synthax error: unmatched quote character\n", 53);
 			index = 0;
 			return ("\0");
 		}

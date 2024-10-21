@@ -6,13 +6,13 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 15:24:36 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/11 18:12:51 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/21 15:51:20 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/executor.h"
 
-void	handle_echo(t_minishell *minishell)  // echo only prints it's own arguments it does not process input from the pipe, but it can redirect it to other commands
+void	handle_echo(t_minishell *minishell)	
 {
 	t_command	*command_cpy;
 	bool		nl;
@@ -24,7 +24,7 @@ void	handle_echo(t_minishell *minishell)  // echo only prints it's own arguments
 		printf("\n");
 	else
 	{
-		if (ft_strncmp(command_cpy->content, "-n", ft_strlen(command_cpy->content)) == 0)
+		if (ft_strncmp(command_cpy->next->content, "-n", ft_strlen(command_cpy->next->content)) == 0)
 		{
 			nl = false;
 			command_cpy = command_cpy->next;
@@ -46,28 +46,30 @@ void	handle_pwd(t_minishell *minishell)
 {
 	char	*line;
 	int		i;
-	size_t	size;
 
 	line = NULL;
-	size = 0;
 	i = 0;
 	while (minishell->env[i] != NULL)
 	{
-		size = ft_strlen(minishell->env[i]);
-		if (ft_strnstr(minishell->env[i], "PWD=/", size) != NULL)
+		if (ft_strnstr(minishell->env[i], "PWD=", 4) != NULL)
 		{
 			line = ft_strdup(minishell->env[i]);
-			break;
+			i = 4;
+			while (line[i])
+			{
+				write(1, &line[i], 1);
+				i++;
+			}
+			write (1, "\n", 1);
+			free(line);
+			return ;
 		}
 		i++;
 	}
-	i = 4;
-	while (line[i])
-	{
-		write(1, &line[i], 1);
-		i++;
-	}
-	write (1, "\n", 1);
+	line = malloc(PATH_MAX);
+	getcwd(line, PATH_MAX);
+	printf("%s\n", line);
+	free(line);
 }
 
 void	handle_cd(t_minishell *minishell)
@@ -80,7 +82,7 @@ void	handle_cd(t_minishell *minishell)
 		path = ft_getenv(minishell, "HOME");
 		if (!path)
 		{
-			printf("Minishell: cd: HOME not set\n");
+			write(STDERR_FILENO, "Minishell: cd: HOME not set\n", 29);
 			return ;
 		}
 	}
@@ -88,7 +90,9 @@ void	handle_cd(t_minishell *minishell)
 		path = minishell->table->simple_command->next->content;
 	if (chdir(path) != 0)
 	{
-		printf("Minishell: cd: %s: No such file or directory\n", path);
+		write(STDERR_FILENO, "Minishell: cd: ", 15);
+		write(STDERR_FILENO, path, ft_strlen(path));
+		write(STDERR_FILENO, ": No such file or directory\n", 29);
 		return ;
 	}
 	getcwd(cwd, sizeof(cwd));
@@ -129,7 +133,7 @@ void	handle_export(t_minishell *minishell)
 		while (--i >= 0)
 			newenv[i] = ft_strdup(minishell->env[i]);
 		swap_vars(newenv);
-		free_env(minishell);
+		free_arr(minishell->env);
 		minishell->env = newenv;
 	}
 	if (minishell->table->simple_command->next != NULL)
@@ -169,23 +173,25 @@ void	handle_unset(t_minishell *minishell)
 void	execute_file(t_minishell *minishell)
 {
 	char	*path;
+	char	*filename;
 	char	**arg_arr;
+	int		i;
 
-	path = minishell->table->simple_command->content;
-	path = ft_strjoin(ft_getcwd(minishell), path + 1);
+	i = 0;
+	arg_arr = NULL;
+	filename = minishell->table->simple_command->content;
+	path = ft_strjoin(ft_getcwd(minishell), filename + 1);
 	if (access(path, X_OK) == 0)
 	{
 		arg_arr = create_arg_lst(minishell);
-		if (!arg_arr)
-		{
-			arg_arr = malloc(sizeof(char *) * 2);
-			arg_arr[0] = ft_strdup(minishell->table->simple_command->content);
-			arg_arr[1] = NULL;
-		}
 		execve(path, arg_arr, minishell->env);
 	}
 	else
-		printf("Minishell: cd: %s: No such file or directory\n", path);
+	{
+		write(STDERR_FILENO, "Minishell: ", 11);
+		write(STDERR_FILENO, filename, ft_strlen(filename));
+		write(STDERR_FILENO, ": No such file or directory\n", 29);
+	}
 }
 
 void	check_path(t_minishell *minishell)
@@ -196,8 +202,16 @@ void	check_path(t_minishell *minishell)
 	int		i;
 
 	i = 0;
-	valid_cmd = false;	
+	valid_cmd = false;
 	path = ft_getenv(minishell, "PATH");
+	if (!path)
+	{
+		path = minishell->table->simple_command->content;
+		write(STDERR_FILENO, "Minishell: ", 11);
+		write(STDERR_FILENO, path, ft_strlen(path));
+		write(STDERR_FILENO, ": command not found\n", 21);
+		return ;
+	}
 	paths = ft_split(path, ':');
 	path = NULL;
 	while (paths[i] != NULL)
@@ -213,10 +227,17 @@ void	check_path(t_minishell *minishell)
 	}
 	if (valid_cmd == true)
 	{
-		free(paths);
+		free_arr(paths);
 		paths = list2array(minishell);
 		execve(path, paths, minishell->env);	
 	}
 	else
-		printf("Minishell: %s: command not found\n", minishell->table->simple_command->content);
+	{
+		free(path);
+		free_arr(paths);
+		path = minishell->table->simple_command->content;
+		write(STDERR_FILENO, "Minishell: ", 11);
+		write(STDERR_FILENO, path, ft_strlen(path));
+		write(STDERR_FILENO, ": command not found\n", 21);
+	}	
 }
