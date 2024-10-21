@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 14:43:06 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/19 18:49:52 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/21 17:14:28 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ void	parse_input(char *line, t_minishell *minishell)
 
 	i = 0;
 	table = NULL;
-	token_lst = process_input(line);
+	token_lst = process_input(line, minishell);
 	if (token_lst == NULL)
 		return ;
 	while (token_lst)
@@ -39,7 +39,7 @@ void	parse_input(char *line, t_minishell *minishell)
 		}	
 		if (token_lst->token == TOKEN_PIPE)
 		{
-			if (check_valid_pipe(token_lst, table) == -1)
+			if (check_valid_pipe(token_lst, table, minishell) == -1)
 				break ; // FREE EVERYTHING, GO BACK TO 0
 		}
 		if (token_lst->token != TOKEN_FILENAME | token_lst->token != TOKEN_DELIMITER)

@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 15:36:41 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/21 15:59:14 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/21 17:42:48 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -203,6 +203,8 @@ int	handle_redirections(t_minishell *minishell)
 			write(STDERR_FILENO, "Minishell: ", 11);
 			write(STDERR_FILENO, minishell->in_redir, ft_strlen(minishell->in_redir));
 			write(STDERR_FILENO, ": No such file or directory\n", 29);
+			minishell->exit_code = 6;
+			minishell->success = false;
 			minishell->infd = fd;
 			return (-1);
 		}
@@ -220,6 +222,8 @@ int	handle_redirections(t_minishell *minishell)
 		if (fd < 0)
 		{
 			write(STDERR_FILENO, "Minishell: Error opening output file\n", 38);
+			minishell->exit_code = 7;
+			minishell->success = false;
 			minishell->outfd = fd;
 			return (-1);
 		}
@@ -248,4 +252,8 @@ void	restore_redirections(t_minishell *minishell)
 	}
 	if (open(".heredoc_tmp", O_RDONLY, 0644) > 0)
 		unlink(".heredoc_tmp");
+	if (minishell->success)
+		minishell->exit_code = 0;
+	else
+		minishell->success = true;
 }

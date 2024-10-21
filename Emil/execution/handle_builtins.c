@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 15:24:36 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/21 15:51:20 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/21 17:19:23 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,8 @@ void	handle_cd(t_minishell *minishell)
 		if (!path)
 		{
 			write(STDERR_FILENO, "Minishell: cd: HOME not set\n", 29);
+			minishell->exit_code = 1;
+			minishell->success = false;
 			return ;
 		}
 	}
@@ -93,6 +95,8 @@ void	handle_cd(t_minishell *minishell)
 		write(STDERR_FILENO, "Minishell: cd: ", 15);
 		write(STDERR_FILENO, path, ft_strlen(path));
 		write(STDERR_FILENO, ": No such file or directory\n", 29);
+		minishell->exit_code = 2;
+		minishell->success = false;
 		return ;
 	}
 	getcwd(cwd, sizeof(cwd));
@@ -191,6 +195,8 @@ void	execute_file(t_minishell *minishell)
 		write(STDERR_FILENO, "Minishell: ", 11);
 		write(STDERR_FILENO, filename, ft_strlen(filename));
 		write(STDERR_FILENO, ": No such file or directory\n", 29);
+		minishell->exit_code = 3;
+		minishell->success = false;
 	}
 }
 
@@ -210,6 +216,8 @@ void	check_path(t_minishell *minishell)
 		write(STDERR_FILENO, "Minishell: ", 11);
 		write(STDERR_FILENO, path, ft_strlen(path));
 		write(STDERR_FILENO, ": command not found\n", 21);
+		minishell->exit_code = 4;
+		minishell->success = false;
 		return ;
 	}
 	paths = ft_split(path, ':');
@@ -239,5 +247,7 @@ void	check_path(t_minishell *minishell)
 		write(STDERR_FILENO, "Minishell: ", 11);
 		write(STDERR_FILENO, path, ft_strlen(path));
 		write(STDERR_FILENO, ": command not found\n", 21);
+		minishell->exit_code = 5;
+		minishell->success = false;
 	}	
 }

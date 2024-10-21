@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 13:27:42 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/10 19:46:58 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/21 17:38:49 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ typedef enum
 	TOKEN_UNKNOWN
 }	token_type;
 
+
 typedef struct t_tokenizer
 {
 	char				*content;
@@ -50,11 +51,37 @@ typedef struct t_tokenizer
 	struct t_tokenizer	*next;
 }		t_tokens;
 
+typedef struct	t_simple_command
+{
+	char						*content;
+	struct	t_simple_command	*next;
+}	t_command;
 
+typedef	struct	t_test_struct
+{
+	bool						leftpipe;
+	bool						rightpipe;
+	t_command					*simple_command;
+	struct t_test_struct		*next;
+}		t_command_table;
 
-t_tokens	*process_input(char *line);
+typedef struct t_minishell
+{
+	t_command_table	*table;
+	char			**env;
+	char			**var_lst;
+	char			*out_redir;
+	int				outfd;
+	char			*in_redir;
+	int				infd;
+	int				exit_code;
+	bool			success;
+	bool			append_mode;
+}		t_minishell;
+
+t_tokens	*process_input(char *line, t_minishell *minishell);
 bool    	ft_isspace(char index);
-char    	*get_next_token(char *line, int *quote_type);
+char    	*get_next_token(char *line, int *quote_type, t_minishell *minishell);
 char		*ft_strndup(char *s1, size_t len);
 void		set_quote_type(int *quote_type, char quote);
 token_type	identify_token(char *token, int quote_type);

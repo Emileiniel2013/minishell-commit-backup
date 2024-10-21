@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 11:41:14 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/21 15:33:12 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/21 17:34:09 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,9 @@ void	mini_main(t_minishell *minishell)
 	int	pipefd[2];
 	int	prevpipefd;
 	int	pid;
+	int	status;
 
+	status = 0;
 	prevpipefd = -1;
 	while(minishell->table != NULL)
 	{
@@ -74,9 +76,20 @@ void	mini_main(t_minishell *minishell)
 			else if (!minishell->table->rightpipe && minishell->out_redir)
 				dup2(minishell->outfd, STDOUT_FILENO);
 			executor(minishell);
-			exit(EXIT_SUCCESS);
+			if (minishell->success)
+				exit(EXIT_SUCCESS);
+			else
+				exit(minishell->exit_code);
 		}
-		waitpid(pid, NULL, 0);
+		waitpid(pid, &status, 0);
+		if (WIFEXITED(status))
+		{
+			if (WEXITSTATUS(status) != 0)
+			{
+				minishell->exit_code = WEXITSTATUS(status);
+				minishell->success = false;
+			}
+		}
 		if (minishell->table->leftpipe)
 			close(prevpipefd);
 		if (minishell->table->rightpipe)

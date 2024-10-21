@@ -6,13 +6,13 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 14:43:06 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/21 16:03:16 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/21 17:15:40 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/lexer.h"
 
-char    *get_next_token(char *line, int *quote_type)
+char    *get_next_token(char *line, int *quote_type, t_minishell *minishell)
 {
     static int	index = 0;
 	int			start;
@@ -40,6 +40,8 @@ char    *get_next_token(char *line, int *quote_type)
 		else
 		{
 			write(STDERR_FILENO, "Minishell: synthax error: unmatched quote character\n", 53);
+			minishell->exit_code = 16;
+			minishell->success = false;
 			index = 0;
 			return ("\0");
 		}
@@ -59,7 +61,7 @@ char    *get_next_token(char *line, int *quote_type)
 
 
 
-t_tokens	*process_input(char *line)
+t_tokens	*process_input(char *line, t_minishell *minishell)
 {
     t_tokens    *token_lst_head;
     char        *content;
@@ -68,7 +70,7 @@ t_tokens	*process_input(char *line)
 
 	token_lst_head = NULL;
 	quote_type = 0;
-	content = get_next_token(line, &quote_type);
+	content = get_next_token(line, &quote_type, minishell);
 	if (content && content[0] == '\0')
 		return (NULL); // TODO / FREE EVERYTHING / GO BACK TO 0
 	while (content != NULL)
@@ -76,7 +78,7 @@ t_tokens	*process_input(char *line)
 		type = identify_token(content, quote_type);
 		add_token_to_lst(&token_lst_head, content, type);
 		free(content);
-		content = get_next_token(line, &quote_type);
+		content = get_next_token(line, &quote_type, minishell);
 		if (content && content[0] == '\0')
 			return (NULL); // TODO / FREE EVERYTHING / GO BACK TO 0
 	}

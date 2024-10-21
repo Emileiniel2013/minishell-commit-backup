@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/02 17:50:07 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/18 17:39:56 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/21 17:04:10 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@ int	main(int argc, char *argv[], char *envp[])
 	minishell->append_mode = false;
 	minishell->infd = 0;
 	minishell->outfd = 1;
+	minishell->exit_code = 0;
+	minishell->success = true;
 	while(1)
 	{
 		line = readline("Minishell $ ");
