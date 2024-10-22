@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 15:24:36 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/21 17:19:23 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/22 13:35:37 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,6 +172,50 @@ void	handle_unset(t_minishell *minishell)
 	}
 	if (minishell->table->simple_command->next != NULL)
 		handle_unset(minishell);
+}
+
+void        handle_exit(t_minishell *minishell) // HERE WE NEED TO NOT FORGET ABOUT FREEING
+{
+	int	i;
+	t_command	*command_cpy;
+	char		*exit_code;
+	
+	i = 0;
+	command_cpy = minishell->table->simple_command;
+	exit_code = NULL;
+	while(command_cpy)
+	{
+		command_cpy = command_cpy->next;
+		i++;
+	}
+	if (i > 2)
+	{
+		write(STDERR_FILENO, "Minishell: exit: too many arguments\n", 36);
+		minishell->exit_code = 17;
+		minishell->success = false;
+		return ;
+	}
+	else
+	{
+		if (i == 2 && ft_isnumber(minishell->table->simple_command->next->content))
+		{
+			minishell->exit_code = ft_atoi(minishell->table->simple_command->next->content);
+			exit(minishell->exit_code);
+		}
+		else if (i == 2 && !ft_isnumber(minishell->table->simple_command->next->content))
+		{
+			exit_code = minishell->table->simple_command->next->content;
+			write(STDERR_FILENO, "Minishell: exit: ", 17);
+			write(STDERR_FILENO, exit_code, ft_strlen(exit_code));
+			write(STDERR_FILENO, ": numeric argument required\n", 29);
+			minishell->exit_code = 18;
+			minishell->success = false;
+			return ;
+		}
+		exit(EXIT_SUCCESS);
+	}
+	
+	
 }
 
 void	execute_file(t_minishell *minishell)

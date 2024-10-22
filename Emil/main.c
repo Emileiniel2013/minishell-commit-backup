@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/02 17:50:07 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/21 17:04:10 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/21 18:17:55 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,22 +16,8 @@ int	main(int argc, char *argv[], char *envp[])
 {
 	t_minishell			*minishell;
 	char				*line;
-	char				**envp_cpy;
 	
-	(void)argv;
-	(void)argc;
-	minishell = malloc(sizeof(t_minishell));
-	envp_cpy = copy_env(envp);
-	minishell->env = envp_cpy;
-	minishell->var_lst = NULL;
-	minishell->table = NULL;
-	minishell->out_redir = NULL;
-	minishell->in_redir = NULL;
-	minishell->append_mode = false;
-	minishell->infd = 0;
-	minishell->outfd = 1;
-	minishell->exit_code = 0;
-	minishell->success = true;
+	minishell = init_mini_vars(argc, argv, envp);
 	while(1)
 	{
 		line = readline("Minishell $ ");
@@ -39,6 +25,7 @@ int	main(int argc, char *argv[], char *envp[])
 		{
 			add_history(line);
 			parse_input(line, minishell);
+			free(line);
 			if (minishell->table)
 			{
 				if (handle_redirections(minishell) != -1)
@@ -47,8 +34,8 @@ int	main(int argc, char *argv[], char *envp[])
 						executor(minishell);
 					else
 						mini_main(minishell);
-				}
-			} // ELSE DESTROY AND FREE EVERYTHING !!!
+				} // ELSE DESTROY AND FREE EVERYTHING !!!
+			}
 			restore_redirections(minishell);
 		}
 	}

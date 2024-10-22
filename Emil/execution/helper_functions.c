@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 15:36:41 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/21 17:42:48 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/22 13:05:20 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -256,4 +256,38 @@ void	restore_redirections(t_minishell *minishell)
 		minishell->exit_code = 0;
 	else
 		minishell->success = true;
+}
+
+t_minishell	*init_mini_vars(int argc, char **argv, char **envp)
+{
+	t_minishell	*minishell;
+	char		**envp_cpy;
+
+	(void)argc;
+	(void)argv;
+	minishell = malloc(sizeof(t_minishell));
+	envp_cpy = copy_env(envp);
+	minishell->env = envp_cpy;
+	minishell->var_lst = NULL;
+	minishell->table = NULL;
+	minishell->out_redir = NULL;
+	minishell->in_redir = NULL;
+	minishell->append_mode = false;
+	minishell->infd = STDIN_FILENO;
+	minishell->outfd = STDOUT_FILENO;
+	minishell->exit_code = 0;
+	minishell->success = true;
+	return (minishell);
+}
+
+bool	ft_isnumber(char *content)
+{
+	while (*content)
+	{
+		if (*content >= '0' && *content <= '9')
+			content++;
+		else
+			return (false);
+	}
+	return (true);
 }

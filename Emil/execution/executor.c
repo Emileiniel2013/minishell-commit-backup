@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 11:41:14 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/21 17:34:09 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/22 12:48:38 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,8 @@ void	executor(t_minishell *minishell)
 			handle_export(minishell);
 		else if (ft_strncmp(content, "unset", ft_strlen(content)) == 0)
 			handle_unset(minishell);
+		else if (ft_strncmp(content, "exit", ft_strlen(content)) == 0)
+			handle_exit(minishell);
 		else if ((ft_strncmp (content, "./", 2)) == 0)
 			execute_file(minishell);
 		else if (ft_strchr(content + 1, '=') != NULL)

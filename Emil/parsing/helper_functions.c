@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 15:13:00 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/21 17:18:35 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/22 13:27:12 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -275,6 +275,8 @@ bool    check_builtin(t_minishell *minishell)
 		else if (ft_strncmp(content, "export", ft_strlen(content)) == 0)
 			return (true);
 		else if (ft_strncmp(content, "unset", ft_strlen(content)) == 0)
+			return (true);
+		else if (ft_strncmp(content, "exit", ft_strlen(content)) == 0)
 			return (true);
 		else if (ft_strchr(content + 1, '=') != NULL)
 			return (true);
