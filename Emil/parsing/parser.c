@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 14:43:06 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/21 17:14:28 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/23 18:46:10 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,36 +15,64 @@
 void	parse_input(char *line, t_minishell *minishell)
 {
 	t_tokens		*token_lst;
+	t_tokens		*lst_head;
 	t_command_table	*table;
-	int				i;
 
-	i = 0;
 	table = NULL;
+	if (line[0] != '\0')
+		add_history(line);
 	token_lst = process_input(line, minishell);
-	if (token_lst == NULL)
+	lst_head = token_lst;
+	if (!token_lst)
 		return ;
 	while (token_lst)
 	{
 		if (token_lst->token == TOKEN_REDIRECT_OUT || token_lst->token == TOKEN_REDIRECT_OUT_APPEND || token_lst->token == TOKEN_REDIRECT_IN)
 		{
 			if (check_valid_redir_input(&token_lst, minishell) == -1)
-				break ; // FREE EVERYTHING, GO BACK TO 0
+			{
+				free_token_lst(token_lst);
+				if (table)
+				{
+					minishell->table = table;
+					free_table(minishell);
+				}
+				return ;
+			}
 		}
 		if (token_lst->token == TOKEN_STRING || token_lst->token == TOKEN_DOUBLE_QUOTE)
 			expand_env_vars(&token_lst->content, minishell, token_lst->token);
 		if (token_lst->token == TOKEN_HEREDOC)
 		{
 			if (handle_heredoc(&token_lst, minishell) == -1)
-				break ; // FREE EVERYTHING, GO BACK TO 0
+			{
+				free_token_lst(token_lst);
+				if (table)
+				{
+					minishell->table = table;
+					free_table(minishell);
+				}
+				return ;
+			}
 		}	
 		if (token_lst->token == TOKEN_PIPE)
 		{
 			if (check_valid_pipe(token_lst, table, minishell) == -1)
-				break ; // FREE EVERYTHING, GO BACK TO 0
+			{
+				free_token_lst(token_lst);
+				if (table)
+				{
+					minishell->table = table;
+					free_table(minishell);
+				}
+				return ;
+			}
 		}
-		if (token_lst->token != TOKEN_FILENAME | token_lst->token != TOKEN_DELIMITER)
+		if ((token_lst->token != TOKEN_FILENAME) | (token_lst->token != TOKEN_DELIMITER))
 			add_token_to_table(&table, token_lst);
 		token_lst = token_lst->next;
 	}
+	free_token_lst(lst_head);
 	minishell->table = table;
+	minishell->table_head = table;
 }

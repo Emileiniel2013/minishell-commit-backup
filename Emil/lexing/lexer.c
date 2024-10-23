@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 14:43:06 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/21 17:15:40 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/23 15:01:03 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,15 +72,19 @@ t_tokens	*process_input(char *line, t_minishell *minishell)
 	quote_type = 0;
 	content = get_next_token(line, &quote_type, minishell);
 	if (content && content[0] == '\0')
-		return (NULL); // TODO / FREE EVERYTHING / GO BACK TO 0
+		return (NULL);
 	while (content != NULL)
 	{
 		type = identify_token(content, quote_type);
 		add_token_to_lst(&token_lst_head, content, type);
 		free(content);
+		content = NULL;
 		content = get_next_token(line, &quote_type, minishell);
 		if (content && content[0] == '\0')
-			return (NULL); // TODO / FREE EVERYTHING / GO BACK TO 0
+		{
+			free_token_lst(token_lst_head);
+			return (NULL);
+		}
 	}
 	return(token_lst_head);
 }

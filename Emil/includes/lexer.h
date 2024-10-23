@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 13:27:42 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/21 17:38:49 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/23 17:53:32 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,12 +62,14 @@ typedef	struct	t_test_struct
 	bool						leftpipe;
 	bool						rightpipe;
 	t_command					*simple_command;
+	t_command					*cmd_head;
 	struct t_test_struct		*next;
 }		t_command_table;
 
 typedef struct t_minishell
 {
 	t_command_table	*table;
+	t_command_table *table_head;
 	char			**env;
 	char			**var_lst;
 	char			*out_redir;
@@ -87,6 +89,6 @@ void		set_quote_type(int *quote_type, char quote);
 token_type	identify_token(char *token, int quote_type);
 void		add_token_to_lst(t_tokens **list_head,char *content, token_type token);
 t_tokens	*create_new_node(char *content, token_type token);
-char		*print_token(token_type token);
+void		free_token_lst(t_tokens *token_lst);
 
 #endif

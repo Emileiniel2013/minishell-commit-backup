@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 15:13:00 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/22 13:27:12 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/23 18:41:55 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,12 @@ char	*check_quoted_string(char **content, t_minishell *minishell)
 	int		j;
 	char	*expanded_env;
 	char	*temp;
+	char	*temp2;
 
 	i = 0;
 	j = 0;
 	temp = NULL;
+	temp2 = NULL;
 	expanded_env = NULL;
 	while((*content)[i] && (*content)[i] != '$')
 		i++;
@@ -34,12 +36,30 @@ char	*check_quoted_string(char **content, t_minishell *minishell)
 		i++;
 		j++;
 	}
-	temp = ft_strndup((*content) + (i - j), j);
-	temp = ft_getenv(minishell, temp);
+	temp2 = ft_strndup((*content) + (i - j), j);
+	temp = ft_getenv(minishell, temp2);
+	free(temp2);
+	temp2 = NULL;
 	if (temp)
-		expanded_env = ft_strjoin(expanded_env, temp);
+	{
+		temp2 = ft_strdup(expanded_env);
+		free(expanded_env);
+		expanded_env = ft_strjoin(temp2, temp);
+		free(temp);
+		free(temp2);
+		temp2 = NULL;
+		temp = NULL;
+	}
 	if ((*content)[i])
-		expanded_env = ft_strjoin(expanded_env, (*content) + i);
+	{
+		temp2 = ft_strdup(expanded_env);
+		free(expanded_env);
+		expanded_env = ft_strjoin(temp2, (*content) + i);
+		free(temp);
+		free(temp2);
+		temp = NULL;
+		temp2 = NULL;
+	}
 	return (expanded_env);
 }
 
@@ -51,25 +71,24 @@ char	*ft_getenv(t_minishell *minishell, char	*env)
 
 	len = ft_strlen(env);
 	i = -1;
+	var = NULL;
 	while(minishell->env[++i])
 	{
 		if(ft_strncmp(minishell->env[i], env, len) == 0 && minishell->env[i][len] == '=')
 		{
-			var = ft_strdup(minishell->env[i] + len + 1);
+			var = ft_strdup(minishell->env[i] + (len + 1));
 			return (var);
 		}
 	}
-	return (NULL);
+	return (var);
 }
 
 char	**copy_env(char **envp)
 {
 	char	**cpy;
 	int		i;
-	size_t	size;
 
 	i = 0;
-	size = 0;
 	while (envp[i] != NULL)
 		i++;
 	cpy = malloc(sizeof(char *) * (i + 1));
@@ -77,7 +96,6 @@ char	**copy_env(char **envp)
 	i = 0;
 	while (envp[i] != NULL)
 	{
-		size = ft_strlen(envp[i]);
 		cpy[i] = ft_strdup(envp[i]);
 		i++;
 	}
@@ -218,6 +236,7 @@ void	add_token_to_table(t_command_table **table, t_tokens *token_lst)
 			current_node->simple_command = malloc(sizeof(t_command));
 			current_node->simple_command->content = ft_strdup(token_lst->content);
 			current_node->simple_command->next = NULL;
+			current_node->cmd_head = current_node->simple_command;
 		}
 		else
 			add_cmd_node(&current_node->simple_command, token_lst->content);
@@ -231,6 +250,7 @@ void	add_token_to_table(t_command_table **table, t_tokens *token_lst)
 		new_node = malloc(sizeof(t_command_table));
 		new_node->leftpipe = true;
 		new_node->rightpipe = false;
+		new_node->simple_command = NULL;
 		new_node->next = NULL;
 		current_node->next = new_node;
 	}
@@ -331,6 +351,43 @@ int	handle_heredoc(t_tokens **token_lst, t_minishell *minishell)
 		write(fd, "\n", 1);
 	}
 	minishell->in_redir = ft_strdup(".heredoc_tmp");
+	free(delimiter);
+	delimiter = NULL;
 	close(fd); 
 	return (0);
+}
+
+void	free_table(t_minishell *minishell)
+{
+	t_command_table *current;
+	t_command_table	*next;
+
+	next = NULL;
+	current = minishell->table_head;
+	while (current)
+	{
+		next = current->next;
+		if (current->cmd_head)
+			free_cmd(current->cmd_head);
+		free(current);
+		current = next;
+	}
+	minishell->table = NULL;
+}
+
+void	free_cmd(t_command *cmd)
+{
+	t_command	*current;
+	t_command	*next;
+
+	current = cmd;
+	next = NULL;
+	while (current)
+	{
+		next = current->next;
+		if (current->content)
+			free(current->content);
+		free(current);
+		current = next;
+	}
 }

@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 10:56:58 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/22 13:05:35 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/23 18:30:18 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,5 +41,7 @@ int			handle_redirections(t_minishell *minishell);
 void		restore_redirections(t_minishell *minishell);
 t_minishell	*init_mini_vars(int argc, char **argv, char **envp);
 bool		ft_isnumber(char *content);
+void		free_minishell(t_minishell *minishell, bool keep_env);
+void        sigint_handler(int sig);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 15:24:36 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/22 13:35:37 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/23 19:30:07 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,6 +134,8 @@ void	handle_export(t_minishell *minishell)
 		newenv = malloc(sizeof(char *) * (i + 2));
 		newenv[i + 1] = NULL;
 		newenv[i] = ft_strdup(newvar);
+		free(newvar);
+		newvar = NULL;
 		while (--i >= 0)
 			newenv[i] = ft_strdup(minishell->env[i]);
 		swap_vars(newenv);
@@ -174,7 +176,7 @@ void	handle_unset(t_minishell *minishell)
 		handle_unset(minishell);
 }
 
-void        handle_exit(t_minishell *minishell) // HERE WE NEED TO NOT FORGET ABOUT FREEING
+void        handle_exit(t_minishell *minishell)
 {
 	int	i;
 	t_command	*command_cpy;
@@ -195,14 +197,15 @@ void        handle_exit(t_minishell *minishell) // HERE WE NEED TO NOT FORGET AB
 		minishell->success = false;
 		return ;
 	}
-	else
+	else if (i == 2)
 	{
-		if (i == 2 && ft_isnumber(minishell->table->simple_command->next->content))
+		if (ft_isnumber(minishell->table->simple_command->next->content))
 		{
 			minishell->exit_code = ft_atoi(minishell->table->simple_command->next->content);
+			free_minishell(minishell, false);
 			exit(minishell->exit_code);
 		}
-		else if (i == 2 && !ft_isnumber(minishell->table->simple_command->next->content))
+		else
 		{
 			exit_code = minishell->table->simple_command->next->content;
 			write(STDERR_FILENO, "Minishell: exit: ", 17);
@@ -212,10 +215,9 @@ void        handle_exit(t_minishell *minishell) // HERE WE NEED TO NOT FORGET AB
 			minishell->success = false;
 			return ;
 		}
-		exit(EXIT_SUCCESS);
 	}
-	
-	
+	free_minishell(minishell, false);
+	exit(EXIT_SUCCESS);
 }
 
 void	execute_file(t_minishell *minishell)
@@ -223,16 +225,18 @@ void	execute_file(t_minishell *minishell)
 	char	*path;
 	char	*filename;
 	char	**arg_arr;
-	int		i;
+	char	**env;
 
-	i = 0;
 	arg_arr = NULL;
+	env = NULL;
 	filename = minishell->table->simple_command->content;
 	path = ft_strjoin(ft_getcwd(minishell), filename + 1);
 	if (access(path, X_OK) == 0)
 	{
 		arg_arr = create_arg_lst(minishell);
-		execve(path, arg_arr, minishell->env);
+		env = minishell->env;
+		free_minishell(minishell, true);
+		execve(path, arg_arr, env);
 	}
 	else
 	{
@@ -250,9 +254,13 @@ void	check_path(t_minishell *minishell)
 	bool	valid_cmd;
 	char	**paths;
 	int		i;
+	char	**env;
+	char	*temp;
 
 	i = 0;
 	valid_cmd = false;
+	env = NULL;
+	temp = NULL;
 	path = ft_getenv(minishell, "PATH");
 	if (!path)
 	{
@@ -265,27 +273,31 @@ void	check_path(t_minishell *minishell)
 		return ;
 	}
 	paths = ft_split(path, ':');
-	path = NULL;
+	free(path);
 	while (paths[i] != NULL)
 	{
-		path = ft_strjoin(paths[i], "/");
-		path = ft_strjoin(path, minishell->table->simple_command->content);
+		temp = ft_strjoin(paths[i], "/");
+		path = ft_strjoin(temp, minishell->table->simple_command->content);
+		free(temp);
+		temp = NULL;
 		if (access(path, X_OK) == 0)
 		{
 			valid_cmd = true;
 			break ;
 		}
+		free(path);
 		i++;
 	}
 	if (valid_cmd == true)
 	{
 		free_arr(paths);
 		paths = list2array(minishell);
-		execve(path, paths, minishell->env);	
+		env = minishell->env;
+		free_minishell(minishell, true);
+		execve(path, paths, env);	
 	}
 	else
 	{
-		free(path);
 		free_arr(paths);
 		path = minishell->table->simple_command->content;
 		write(STDERR_FILENO, "Minishell: ", 11);

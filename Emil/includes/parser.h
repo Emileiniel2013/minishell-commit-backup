@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 13:32:53 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/21 17:38:35 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/22 17:53:50 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,5 +31,7 @@ void	add_token_to_table(t_command_table **table, t_tokens *token_lst);
 void	add_cmd_node(t_command **cmd, char *content);
 bool    check_builtin(t_minishell *minishell);
 int		handle_heredoc(t_tokens **token_lst, t_minishell *minishell);
+void	free_table(t_minishell *minishell);
+void	free_cmd(t_command *cmd);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 15:13:00 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/11 17:43:06 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/23 17:08:57 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,10 @@ char    *ft_strndup(char *s1, size_t len)
 	char	*cpy;
 
 	j = 0;
-	cpy = (char *)malloc(sizeof(char) * (len + 1));
+	cpy = NULL;
+	cpy = malloc(sizeof(char) * (len + 1));
 	if (!cpy)
-		return (NULL); // TODO ERROR HANDLING
+		return (NULL);
 	while (s1[j] && j < len)
 	{
 		cpy[j] = s1[j];
@@ -75,7 +76,7 @@ void	add_token_to_lst(t_tokens **list_head,char *content, token_type token)
 	new_token = create_new_node(content, token);
 	current = NULL;
 	if (!new_token)
-		return ; // some error shit might go here later
+		return ;
 	if (*list_head == NULL)
 		*list_head = new_token;
 	else
@@ -98,22 +99,18 @@ t_tokens	*create_new_node(char *content, token_type token)
 	return (new_token);
 }
 
-char	*print_token(token_type token)
+void		free_token_lst(t_tokens *token_lst)
 {
-	switch(token)
+	t_tokens	*current;
+	t_tokens	*next;
+
+	current = token_lst;
+	while (current)
 	{
-		case TOKEN_SINGLE_QUOTE: return ("TOKEN_SINGLE_QUOTE");
-		case TOKEN_DOUBLE_QUOTE: return ("TOKEN_DOUBLE_QUOTE");
-		case TOKEN_PIPE : return ("TOKEN_PIPE");
-		case TOKEN_REDIRECT_IN : return ("TOKEN_REDIRECT_IN");
-		case TOKEN_REDIRECT_OUT : return ("TOKEN_REDIRECT_OUT");
-		case TOKEN_REDIRECT_OUT_APPEND : return ("TOKEN_REDIRECT_OUT_APPEND");
-		case TOKEN_HEREDOC : return ("TOKEN_HEREDOC");
-		case TOKEN_STRING : return ("TOKEN_STRING");
-		case TOKEN_COMMAND : return ("TOKEN_COMMAND");
-		case TOKEN_FILENAME : return ("TOKEN_FILENAME");
-		case TOKEN_ARGUMENT : return ("TOKEN_ARGUMENT");
-		case TOKEN_UNKNOWN : return ("TOKEN_UNKNOWN");
-		case TOKEN_DELIMITER : return ("TOKEN_DELIMITER");
+		next = current->next;
+		if (current->content)
+			free(current->content);
+		free(current);
+		current = next;
 	}
 }

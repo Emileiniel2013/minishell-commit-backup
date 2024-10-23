@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 15:36:41 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/22 13:05:20 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/23 19:30:24 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ void	free_arr(char **arr)
 		}
 		free(arr);
 	}
+	arr = NULL;
 }
 
 void	swap_vars(char **newenv)
@@ -75,13 +76,13 @@ char	**list2array(t_minishell *minishell)
 		i++;
 		cmd = cmd->next;
 	}
-	arg_arr = malloc(sizeof(char *) * i + 1);
+	arg_arr = malloc(sizeof(char *) * (i + 1));
 	arg_arr[i] = NULL;
 	cmd = minishell->table->simple_command;
 	i = -1;
 	while (cmd != NULL)
 	{
-		arg_arr[++i] = cmd->content;
+		arg_arr[++i] = ft_strdup(cmd->content);
 		cmd = cmd->next;
 	}
 	return (arg_arr);
@@ -158,6 +159,11 @@ char	*ft_check_var_lst(t_minishell *minishell, char *var)
 				i++;
 			}
 			minishell->var_lst[i] = NULL;
+			if (i == 0)
+			{
+				free(minishell->var_lst);
+				minishell->var_lst = NULL;
+			}
 			return (new_var);
 		}
 	}
@@ -170,8 +176,11 @@ void	add_var_to_list(t_minishell *minishell)
 	char	**var_lst;
 
 	i = 0;
-	while (minishell->var_lst)
-		i++;
+	if (minishell->var_lst)
+	{
+		while (minishell->var_lst[i])
+			i++;
+	}
 	if (i == 0)
 	{
 		var_lst = malloc(sizeof(char *) * 2);
@@ -290,4 +299,35 @@ bool	ft_isnumber(char *content)
 			return (false);
 	}
 	return (true);
+}
+
+void	free_minishell(t_minishell *minishell, bool keep_env)
+{
+	if (minishell->table_head)
+		free_table(minishell);
+	if (minishell->env && !keep_env)
+		free_arr(minishell->env);
+	if (minishell->var_lst)
+		free_arr(minishell->var_lst);
+	if (minishell->in_redir)
+	{
+		free(minishell->in_redir);
+		minishell->in_redir = NULL;
+	}
+	if (minishell->out_redir)
+	{
+		free(minishell->out_redir);
+		minishell->out_redir = NULL;
+	}
+	free(minishell);
+	minishell = NULL;
+}
+
+void	sigint_handler(int sig)
+{
+	(void)sig;
+	printf("\n");
+	rl_on_new_line();
+	rl_replace_line("", 0);
+	rl_redisplay();
 }
