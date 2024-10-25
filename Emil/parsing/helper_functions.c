@@ -6,13 +6,13 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 15:13:00 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/23 18:41:55 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/25 18:29:19 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/parser.h"
 
-char	*check_quoted_string(char **content, t_minishell *minishell)
+char	*check_string(char **content, t_minishell *minishell)
 {
 	int		i;
 	int		j;
@@ -103,47 +103,22 @@ char	**copy_env(char **envp)
 }
 
 
-void	expand_env_vars(char **content, t_minishell *minishell, token_type token)
+void	expand_env_vars(char **content, t_minishell *minishell)
 {
 	char	*expanded_env;
 
 	expanded_env = NULL;
-	if (token == TOKEN_STRING)
+	while (1)
 	{
-		if ((*content)[0] == '$')
+		expanded_env = check_string(content, minishell);
+		if (!expanded_env)
+			break ;
+		else
 		{
-			if (ft_strncmp(*content, "$?", ft_strlen(*content)) == 0)
-			{
-				free(*content);
-				*content = ft_itoa(minishell->exit_code);
-				return ;
-			}
-			expanded_env = ft_getenv(minishell, *content + 1);
-			if (expanded_env == NULL)
-			{
-				free(*content);
-				*content = ft_strdup("");
-			}
-			else
-			{
-				free(*content);
-				*content = ft_strdup(expanded_env);
-				free(expanded_env);
-			}
-		}
-	}
-	else
-	{
-		while (1)
-		{
-			expanded_env = check_quoted_string(content, minishell);
-			if (!expanded_env)
-				break ;
-			else
-			{
-				free(*content);
-				(*content) = expanded_env;
-			}
+			free(*content);
+			(*content) = ft_strdup(expanded_env);
+			free(expanded_env);
+			expanded_env = NULL;
 		}
 	}
 }
@@ -218,7 +193,7 @@ void	add_token_to_table(t_command_table **table, t_tokens *token_lst)
 
 	new_node = NULL;
 	current_node = NULL;
-	if (token_lst->token == TOKEN_STRING || token_lst->token == TOKEN_DOUBLE_QUOTE)
+	if (token_lst->token == TOKEN_STRING || token_lst->token == TOKEN_DOUBLE_QUOTE || token_lst->token == TOKEN_SINGLE_QUOTE)
 	{
 		if (!(*table))
 		{
@@ -373,6 +348,7 @@ void	free_table(t_minishell *minishell)
 		current = next;
 	}
 	minishell->table = NULL;
+	minishell->table_head = NULL;
 }
 
 void	free_cmd(t_command *cmd)

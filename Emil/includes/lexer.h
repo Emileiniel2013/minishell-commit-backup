@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 13:27:42 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/23 17:53:32 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/25 17:59:04 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,5 +90,6 @@ token_type	identify_token(char *token, int quote_type);
 void		add_token_to_lst(t_tokens **list_head,char *content, token_type token);
 t_tokens	*create_new_node(char *content, token_type token);
 void		free_token_lst(t_tokens *token_lst);
+char		*print_token(token_type token);
 
 #endif

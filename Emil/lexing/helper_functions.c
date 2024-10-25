@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 15:13:00 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/23 17:08:57 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/25 18:30:37 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ void	set_quote_type(int *quote_type, char quote)
 token_type	identify_token(char *token, int quote_type)
 {
 	if (quote_type == 1)
-		return (TOKEN_STRING);
+		return (TOKEN_SINGLE_QUOTE);
 	else if (quote_type == 2)
 		return (TOKEN_DOUBLE_QUOTE);
 	else if (ft_strncmp(token, "|", ft_strlen(token)) == 0)
@@ -114,3 +114,23 @@ void		free_token_lst(t_tokens *token_lst)
 		current = next;
 	}
 }
+
+// char	*print_token(token_type token)
+// {
+// 	switch(token)
+// 	{
+// 		case TOKEN_SINGLE_QUOTE: return ("TOKEN_SINGLE_QUOTE");
+// 		case TOKEN_DOUBLE_QUOTE: return ("TOKEN_DOUBLE_QUOTE");
+// 		case TOKEN_PIPE : return ("TOKEN_PIPE");
+// 		case TOKEN_REDIRECT_IN : return ("TOKEN_REDIRECT_IN");
+// 		case TOKEN_REDIRECT_OUT : return ("TOKEN_REDIRECT_OUT");
+// 		case TOKEN_REDIRECT_OUT_APPEND : return ("TOKEN_REDIRECT_OUT_APPEND");
+// 		case TOKEN_HEREDOC : return ("TOKEN_HEREDOC");
+// 		case TOKEN_STRING : return ("TOKEN_STRING");
+// 		case TOKEN_COMMAND : return ("TOKEN_COMMAND");
+// 		case TOKEN_FILENAME : return ("TOKEN_FILENAME");
+// 		case TOKEN_ARGUMENT : return ("TOKEN_ARGUMENT");
+// 		case TOKEN_UNKNOWN : return ("TOKEN_UNKNOWN");
+// 		case TOKEN_DELIMITER : return ("TOKEN_DELIMITER");
+// 	}
+// }

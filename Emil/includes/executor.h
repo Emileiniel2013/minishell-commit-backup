@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 10:56:58 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/23 18:30:18 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/25 18:54:22 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,5 +43,7 @@ t_minishell	*init_mini_vars(int argc, char **argv, char **envp);
 bool		ft_isnumber(char *content);
 void		free_minishell(t_minishell *minishell, bool keep_env);
 void        sigint_handler(int sig);
+void	    handle_signals(void);
+int         check_existing_var(char *newvar, t_minishell *minishell);
 
 #endif

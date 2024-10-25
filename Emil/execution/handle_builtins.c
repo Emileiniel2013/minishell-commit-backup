@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 15:24:36 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/23 19:30:07 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/25 19:35:25 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,23 +124,37 @@ void	handle_export(t_minishell *minishell)
 	i = 0;
 	newenv = NULL;
 	minishell->table->simple_command = minishell->table->simple_command->next;
-	newvar = minishell->table->simple_command->content;
+	if (!minishell->table->simple_command)
+	{
+		handle_env(minishell);
+		return;
+	}
+	newvar = ft_strdup(minishell->table->simple_command->content);
 	if (ft_strchr(newvar, '=') == NULL)
-		newvar = ft_check_var_lst(minishell, minishell->table->simple_command->content);
+		newvar = ft_check_var_lst(minishell, minishell->table->simple_command->content); // HERE WA ARE CREATING A MINOR LEAK I THINK // TO IMPLEMENT += TMROW
 	if (newvar)
 	{
-		while (minishell->env[i] != NULL)
-			i++;
-		newenv = malloc(sizeof(char *) * (i + 2));
-		newenv[i + 1] = NULL;
-		newenv[i] = ft_strdup(newvar);
-		free(newvar);
-		newvar = NULL;
-		while (--i >= 0)
-			newenv[i] = ft_strdup(minishell->env[i]);
-		swap_vars(newenv);
-		free_arr(minishell->env);
-		minishell->env = newenv;
+		i = check_existing_var(newvar, minishell);
+		if (i == -1)
+		{
+			while (minishell->env[++i] != NULL)
+				;
+			newenv = malloc(sizeof(char *) * (i + 2));
+			newenv[i + 1] = NULL;
+			newenv[i] = ft_strdup(newvar);
+			free(newvar);
+			newvar = NULL;
+			while (--i >= 0)
+				newenv[i] = ft_strdup(minishell->env[i]);
+			swap_vars(newenv);
+			free_arr(minishell->env);
+			minishell->env = newenv;
+		}
+		else
+		{
+			free(newvar);
+			newvar = NULL;
+		}
 	}
 	if (minishell->table->simple_command->next != NULL)
 		handle_export(minishell);

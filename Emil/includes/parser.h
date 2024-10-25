@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 13:32:53 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/22 17:53:50 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/25 18:27:57 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,9 @@
 
 char	**copy_env(char **envp);
 void	parse_input(char *line, t_minishell *minishell);
-void	expand_env_vars(char **content, t_minishell *minishell, token_type token);
+void	expand_env_vars(char **content, t_minishell *minishell);
 char	*ft_getenv(t_minishell *minishell, char	*env);
-char	*check_quoted_string(char **content, t_minishell *minishell);
+char	*check_string(char **content, t_minishell *minishell);
 int		check_valid_redir_input(t_tokens **token_lst, t_minishell *minishell);
 int		check_valid_pipe(t_tokens *token_lst, t_command_table *table, t_minishell *minishell);
 void	add_token_to_table(t_command_table **table, t_tokens *token_lst);

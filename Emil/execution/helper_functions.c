@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 15:36:41 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/23 19:30:24 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/25 19:32:15 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,17 +33,11 @@ void	free_arr(char **arr)
 {
 	int i;
 
-	i = 0;
+	i = -1;
 	if (arr)
 	{
-		while (arr[i] != NULL)
-			i++;
-		while (i >= 0)
-		{
-			if (arr[i])
-				free(arr[i]);
-			i--;
-		}
+		while(arr[++i])
+			free(arr[i]);
 		free(arr);
 	}
 	arr = NULL;
@@ -143,8 +137,8 @@ char	*ft_check_var_lst(t_minishell *minishell, char *var)
 	char	*new_var;
 
 	i = -1;
-	len = ft_strlen(var);
 	new_var = NULL;
+	len = ft_strlen(var);
 	if (!minishell->var_lst)
 		return (NULL);
 	while(minishell->var_lst[++i])
@@ -330,4 +324,54 @@ void	sigint_handler(int sig)
 	rl_on_new_line();
 	rl_replace_line("", 0);
 	rl_redisplay();
+}
+
+void	handle_signals(void)
+{
+	rl_catch_signals = 0;
+	signal(SIGQUIT, SIG_IGN);
+	signal(SIGINT, sigint_handler);
+}
+
+int	check_existing_var(char *newvar, t_minishell *minishell)
+{
+	int		i;
+	char	*env;
+	char	*path;
+	char	*target;
+
+	i = 0;
+	env = NULL;
+	path = NULL;
+	target = NULL;
+	while(newvar[i] && newvar[i] != '=')
+		i++;
+	env = ft_strndup(newvar, i);
+	path = ft_getenv(minishell, env);
+	if (path)
+	{
+		target = ft_strjoin(env, "=");
+		free(env);
+		env = ft_strjoin(target, path);
+		free(target);
+		target = NULL;
+		free(path);
+		path = NULL;
+		i = 0;
+		while(minishell->env[i])
+		{
+			if (ft_strncmp(env, minishell->env[i], ft_strlen(env)) == 0)
+			{
+				free(minishell->env[i]);
+				minishell->env[i] = ft_strdup(newvar);
+				free(env);
+				env = NULL;
+				return (i);
+			}
+			i++;
+		}
+	}
+	free(env);
+	env = NULL;
+	return (-1);
 }

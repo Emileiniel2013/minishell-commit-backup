@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 13:43:12 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/22 15:00:06 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/25 15:39:10 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@
 # include "parser.h"
 # include "executor.h"
 
-void	sigint_handler(int sig);
 void	handle_signals(void);
 
 #endif
