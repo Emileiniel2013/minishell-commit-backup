@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 15:13:00 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/25 18:29:19 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/28 16:44:14 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,15 +31,23 @@ char	*check_string(char **content, t_minishell *minishell)
 		return (NULL);
 	expanded_env = ft_strndup(*content, i);
 	i++;
-	while ((*content)[i] && (ft_isalnum((*content)[i]) == 1 || (*content)[i] == '_'))
+	if ((*content)[i] == '?')
 	{
+		temp = ft_itoa(minishell->exit_code);
 		i++;
-		j++;
 	}
-	temp2 = ft_strndup((*content) + (i - j), j);
-	temp = ft_getenv(minishell, temp2);
-	free(temp2);
-	temp2 = NULL;
+	else
+	{
+		while ((*content)[i] && (ft_isalnum((*content)[i]) == 1 || (*content)[i] == '_'))
+		{
+			i++;
+			j++;
+		}
+		temp2 = ft_strndup((*content) + (i - j), j);
+		temp = ft_getenv(minishell, temp2);
+		free(temp2);
+		temp2 = NULL;
+	}
 	if (temp)
 	{
 		temp2 = ft_strdup(expanded_env);
@@ -87,8 +95,10 @@ char	**copy_env(char **envp)
 {
 	char	**cpy;
 	int		i;
+	int		j;
 
 	i = 0;
+	j = 0;
 	while (envp[i] != NULL)
 		i++;
 	cpy = malloc(sizeof(char *) * (i + 1));
@@ -96,8 +106,14 @@ char	**copy_env(char **envp)
 	i = 0;
 	while (envp[i] != NULL)
 	{
-		cpy[i] = ft_strdup(envp[i]);
-		i++;
+		if (ft_strncmp(envp[i], "OLDPWD=", 7) != 0)
+		{
+			cpy[j] = ft_strdup(envp[i]);
+			i++;	
+			j++;
+		}
+		else
+			i++;
 	}
 	return (cpy);
 }
@@ -259,19 +275,19 @@ bool    check_builtin(t_minishell *minishell)
 	content = minishell->table->simple_command->content;
 	if (minishell->table != NULL)
 	{
-		if (ft_strncmp(content, "echo", ft_strlen(content)) == 0)
+		if (ft_strcmp(content, "echo") == 0)
 			return (true);
-		else if (ft_strncmp(content, "pwd", ft_strlen(content)) == 0)
+		else if (ft_strcmp(content, "pwd") == 0)
 			return (true);
-		else if (ft_strncmp(content, "cd", ft_strlen(content)) == 0)
+		else if (ft_strcmp(content, "cd") == 0)
 			return (true);
-		else if (ft_strncmp(content, "env", ft_strlen(content)) == 0)
+		else if (ft_strcmp(content, "env") == 0)
 			return (true);
-		else if (ft_strncmp(content, "export", ft_strlen(content)) == 0)
+		else if (ft_strcmp(content, "export") == 0)
 			return (true);
-		else if (ft_strncmp(content, "unset", ft_strlen(content)) == 0)
+		else if (ft_strcmp(content, "unset") == 0)
 			return (true);
-		else if (ft_strncmp(content, "exit", ft_strlen(content)) == 0)
+		else if (ft_strcmp(content, "exit") == 0)
 			return (true);
 		else if (ft_strchr(content + 1, '=') != NULL)
 			return (true);
@@ -366,4 +382,14 @@ void	free_cmd(t_command *cmd)
 		free(current);
 		current = next;
 	}
+}
+
+int	ft_strcmp(char *s1, char *s2)
+{
+	while (*s1 == *s2 && *s1 && *s2)
+	{
+		++s1;
+		++s2;
+	}
+	return (*s1 - *s2);
 }

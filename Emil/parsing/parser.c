@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 14:43:06 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/25 18:30:56 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/26 20:20:39 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,10 +32,10 @@ void	parse_input(char *line, t_minishell *minishell)
 		{
 			if (check_valid_redir_input(&token_lst, minishell) == -1)
 			{
-				free_token_lst(token_lst);
+				free_token_lst(lst_head);
 				if (table)
 				{
-					minishell->table = table;
+					minishell->table_head = table;
 					free_table(minishell);
 				}
 				return ;
@@ -47,10 +47,10 @@ void	parse_input(char *line, t_minishell *minishell)
 		{
 			if (handle_heredoc(&token_lst, minishell) == -1)
 			{
-				free_token_lst(token_lst);
+				free_token_lst(lst_head);
 				if (table)
 				{
-					minishell->table = table;
+					minishell->table_head = table;
 					free_table(minishell);
 				}
 				return ;
@@ -60,10 +60,10 @@ void	parse_input(char *line, t_minishell *minishell)
 		{
 			if (check_valid_pipe(token_lst, table, minishell) == -1)
 			{
-				free_token_lst(token_lst);
+				free_token_lst(lst_head);
 				if (table)
 				{
-					minishell->table = table;
+					minishell->table_head = table;
 					free_table(minishell);
 				}
 				return ;

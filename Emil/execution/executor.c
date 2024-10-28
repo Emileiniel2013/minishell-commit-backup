@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 11:41:14 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/23 16:00:06 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/28 17:23:37 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,19 +19,19 @@ void	executor(t_minishell *minishell)
 	content = minishell->table->simple_command->content;
 	if (minishell->table != NULL)
 	{
-		if (ft_strncmp(content, "echo", ft_strlen(content)) == 0)
+		if (ft_strcmp(content, "echo") == 0)
 			handle_echo(minishell);
-		else if (ft_strncmp(content, "pwd", ft_strlen(content)) == 0)
+		else if (ft_strcmp(content, "pwd") == 0)
 			handle_pwd(minishell);
-		else if (ft_strncmp(content, "cd", ft_strlen(content)) == 0)
+		else if (ft_strcmp(content, "cd") == 0)
 			handle_cd(minishell);
-		else if (ft_strncmp(content, "env", ft_strlen(content)) == 0)
+		else if (ft_strcmp(content, "env") == 0)
 			handle_env(minishell);
-		else if (ft_strncmp(content, "export", ft_strlen(content)) == 0)
+		else if (ft_strcmp(content, "export") == 0)
 			handle_export(minishell);
-		else if (ft_strncmp(content, "unset", ft_strlen(content)) == 0)
+		else if (ft_strcmp(content, "unset") == 0)
 			handle_unset(minishell);
-		else if (ft_strncmp(content, "exit", ft_strlen(content)) == 0)
+		else if (ft_strcmp(content, "exit") == 0)
 			handle_exit(minishell);
 		else if ((ft_strncmp (content, "./", 2)) == 0)
 			execute_file(minishell);
@@ -57,6 +57,7 @@ void	mini_main(t_minishell *minishell)
 	{
 		if (minishell->table->rightpipe)
 			pipe(pipefd);
+		handle_shlvl(minishell, '+');
 		pid = fork();
 		if (pid == 0)
 		{
@@ -76,14 +77,21 @@ void	mini_main(t_minishell *minishell)
 			else if (!minishell->table->rightpipe && minishell->out_redir)
 				dup2(minishell->outfd, STDOUT_FILENO);
 			executor(minishell);
-			free_minishell(minishell, false);
 			if (minishell->success)
+			{
+				free_minishell(minishell, false);
 				exit(EXIT_SUCCESS);
+			}
 			else
-				exit(minishell->exit_code);
+			{
+				status = minishell->exit_code;
+				free_minishell(minishell, false);
+				exit(status);
+			}
 		}
 		signal(SIGINT, SIG_IGN);
 		waitpid(pid, &status, 0);
+		handle_shlvl(minishell, '-');
 		signal(SIGINT, sigint_handler);
 		if (WIFEXITED(status))
 		{

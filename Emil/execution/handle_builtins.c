@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 15:24:36 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/25 19:35:25 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/28 16:55:56 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,9 @@ void	handle_echo(t_minishell *minishell)
 		printf("\n");
 	else
 	{
-		if (ft_strncmp(command_cpy->next->content, "-n", ft_strlen(command_cpy->next->content)) == 0)
+		if (check_nl(command_cpy->next->content))
 		{
+			printf("I HOPE WE DONT GO HERE\n");
 			nl = false;
 			command_cpy = command_cpy->next;
 		}
@@ -75,9 +76,17 @@ void	handle_pwd(t_minishell *minishell)
 void	handle_cd(t_minishell *minishell)
 {
 	char	*path;
+	char	*temp;
 	char	cwd[1024];
+	int		i;
 
-	if (minishell->table->simple_command->next == NULL)
+	path = NULL;
+	temp = NULL;
+	i = 0;
+	if (minishell->table->simple_command->next)
+		path = minishell->table->simple_command->next->content;
+	getcwd(cwd, sizeof(cwd)); 
+	if (!path || ((ft_strncmp(path, "~", 1) == 0) && (ft_strlen(path) == 1)))
 	{
 		path = ft_getenv(minishell, "HOME");
 		if (!path)
@@ -87,20 +96,79 @@ void	handle_cd(t_minishell *minishell)
 			minishell->success = false;
 			return ;
 		}
+		i = chdir(path);
+		free(path);
+		path = NULL;
+	}
+	else if ((ft_strncmp(path, "-", 1) == 0) && (ft_strlen(path) == 1))
+	{
+		path = ft_getenv(minishell, "OLDPWD");
+		if (!path)
+		{
+			write(STDERR_FILENO, "Minishell: cd: OLDPWD not set\n", 31);
+			minishell->exit_code = 21;
+			minishell->success = false;
+			return ;
+		}
+		i = chdir(path);
+		if (i != 0)
+		{
+			write(STDERR_FILENO, "Minishell: cd: ", 15);
+			write(STDERR_FILENO, path, ft_strlen(path));
+			write(STDERR_FILENO, ": No such file or directory\n", 29);
+			minishell->exit_code = 2;
+			minishell->success = false;
+			free(path);
+			path = NULL;
+			return ;
+		}
+		free(path);
+		path = NULL;
+	}
+	else if ((ft_strncmp(path, "~", 1) == 0) && (ft_strlen(path) != 1))
+	{
+		temp =	ft_getenv(minishell, "HOME");
+		if (!temp)
+		{
+			write(STDERR_FILENO, "Minishell: cd: HOME not set\n", 29);
+			minishell->exit_code = 1;
+			minishell->success = false;
+			return ;
+		}
+		path = ft_strjoin(temp, path + 1);
+		free(temp);
+		temp = NULL;
+		i = chdir(path);
+		if (i != 0)
+		{
+			write(STDERR_FILENO, "Minishell: cd: ", 15);
+			write(STDERR_FILENO, path, ft_strlen(path));
+			write(STDERR_FILENO, ": No such file or directory\n", 29);
+			minishell->exit_code = 2;
+			minishell->success = false;
+			free(path);
+			path = NULL;
+			return ;
+		}
+		free(path);
+		path = NULL;
 	}
 	else
-		path = minishell->table->simple_command->next->content;
-	if (chdir(path) != 0)
 	{
-		write(STDERR_FILENO, "Minishell: cd: ", 15);
-		write(STDERR_FILENO, path, ft_strlen(path));
-		write(STDERR_FILENO, ": No such file or directory\n", 29);
-		minishell->exit_code = 2;
-		minishell->success = false;
-		return ;
+		i = chdir(path);
+		if (i != 0)
+		{
+			write(STDERR_FILENO, "Minishell: cd: ", 15);
+			write(STDERR_FILENO, path, ft_strlen(path));
+			write(STDERR_FILENO, ": No such file or directory\n", 29);
+			minishell->exit_code = 2;
+			minishell->success = false;
+			return ;
+		}
 	}
+	replace_env(minishell, cwd, "OLDPWD=");
 	getcwd(cwd, sizeof(cwd));
-	replace_env(minishell, cwd);
+	replace_env(minishell, cwd, "PWD=");
 }
 
 void	handle_env(t_minishell *minishell)
@@ -123,15 +191,17 @@ void	handle_export(t_minishell *minishell)
 	
 	i = 0;
 	newenv = NULL;
+	newvar = NULL;
 	minishell->table->simple_command = minishell->table->simple_command->next;
 	if (!minishell->table->simple_command)
 	{
 		handle_env(minishell);
 		return;
 	}
-	newvar = ft_strdup(minishell->table->simple_command->content);
-	if (ft_strchr(newvar, '=') == NULL)
-		newvar = ft_check_var_lst(minishell, minishell->table->simple_command->content); // HERE WA ARE CREATING A MINOR LEAK I THINK // TO IMPLEMENT += TMROW
+	if (ft_strchr(minishell->table->simple_command->content, '=') == NULL)
+		newvar = ft_check_var_lst(minishell, minishell->table->simple_command->content);
+	else
+		newvar = ft_strdup(minishell->table->simple_command->content);
 	if (newvar)
 	{
 		i = check_existing_var(newvar, minishell);
@@ -275,49 +345,62 @@ void	check_path(t_minishell *minishell)
 	valid_cmd = false;
 	env = NULL;
 	temp = NULL;
-	path = ft_getenv(minishell, "PATH");
-	if (!path)
+	path = NULL;
+	paths = NULL;
+	if (access(minishell->table->simple_command->content, X_OK) == 0)
 	{
-		path = minishell->table->simple_command->content;
-		write(STDERR_FILENO, "Minishell: ", 11);
-		write(STDERR_FILENO, path, ft_strlen(path));
-		write(STDERR_FILENO, ": command not found\n", 21);
-		minishell->exit_code = 4;
-		minishell->success = false;
-		return ;
-	}
-	paths = ft_split(path, ':');
-	free(path);
-	while (paths[i] != NULL)
-	{
-		temp = ft_strjoin(paths[i], "/");
-		path = ft_strjoin(temp, minishell->table->simple_command->content);
-		free(temp);
-		temp = NULL;
-		if (access(path, X_OK) == 0)
-		{
-			valid_cmd = true;
-			break ;
-		}
-		free(path);
-		i++;
-	}
-	if (valid_cmd == true)
-	{
-		free_arr(paths);
+		path = ft_strdup(minishell->table->simple_command->content);
 		paths = list2array(minishell);
 		env = minishell->env;
 		free_minishell(minishell, true);
-		execve(path, paths, env);	
+		execve(path, paths, env);
 	}
 	else
 	{
-		free_arr(paths);
-		path = minishell->table->simple_command->content;
-		write(STDERR_FILENO, "Minishell: ", 11);
-		write(STDERR_FILENO, path, ft_strlen(path));
-		write(STDERR_FILENO, ": command not found\n", 21);
-		minishell->exit_code = 5;
-		minishell->success = false;
-	}	
+		path = ft_getenv(minishell, "PATH");
+		if (!path)
+		{
+			path = minishell->table->simple_command->content;
+			write(STDERR_FILENO, "Minishell: ", 11);
+			write(STDERR_FILENO, path, ft_strlen(path));
+			write(STDERR_FILENO, ": command not found\n", 21);
+			minishell->exit_code = 4;
+			minishell->success = false;
+			return ;
+		}
+		paths = ft_split(path, ':');
+		free(path);
+		while (paths[i] != NULL)
+		{
+			temp = ft_strjoin(paths[i], "/");
+			path = ft_strjoin(temp, minishell->table->simple_command->content);
+			free(temp);
+			temp = NULL;
+			if (access(path, X_OK) == 0)
+			{
+				valid_cmd = true;
+				break ;
+			}
+			free(path);
+			i++;
+		}
+		if (valid_cmd == true)
+		{
+			free_arr(paths);
+			paths = list2array(minishell);
+			env = minishell->env;
+			free_minishell(minishell, true);
+			execve(path, paths, env);	
+		}
+		else
+		{
+			free_arr(paths);
+			path = minishell->table->simple_command->content;
+			write(STDERR_FILENO, "Minishell: ", 11);
+			write(STDERR_FILENO, path, ft_strlen(path));
+			write(STDERR_FILENO, ": command not found\n", 21);
+			minishell->exit_code = 5;
+			minishell->success = false;
+		}
+	}
 }

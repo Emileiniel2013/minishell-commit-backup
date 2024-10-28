@@ -6,27 +6,48 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 15:36:41 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/25 19:32:15 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/28 17:38:51 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/executor.h"
 
-void	replace_env(t_minishell *minishell, char *path)
+void	replace_env(t_minishell *minishell, char *path, char *env)
 {
 	int		i;
 	size_t	size;
+	bool	found_env;
+	char	**newenv;
 
 	i = 0;
-	while (minishell->env[i] != NULL)
+	found_env = false;
+	newenv = NULL;
+	while (minishell->env[i])
 	{
 		size = ft_strlen(minishell->env[i]);
-		if (ft_strnstr(minishell->env[i], "PWD=/", size) != NULL)
+		if (ft_strnstr(minishell->env[i], env, size) != NULL)
+		{
+			found_env = true;
 			break;
+		}
 		i++;
 	}
-	free(minishell->env[i]);
-	minishell->env[i] = ft_strjoin("PWD=", path);
+	if (found_env)
+	{
+		free(minishell->env[i]);
+		minishell->env[i] = ft_strjoin(env, path);
+	}
+	else
+	{
+		newenv = malloc(sizeof(char *) * (i + 2));
+		newenv[i + 1] = NULL;
+		newenv[i] = ft_strjoin(env, path);
+		while (--i >= 0)
+			newenv[i] = ft_strdup(minishell->env[i]);
+		swap_vars(newenv);
+		free_arr(minishell->env);
+		minishell->env = newenv;
+	}
 }
 
 void	free_arr(char **arr)
@@ -273,6 +294,7 @@ t_minishell	*init_mini_vars(int argc, char **argv, char **envp)
 	minishell->env = envp_cpy;
 	minishell->var_lst = NULL;
 	minishell->table = NULL;
+	minishell->table_head = NULL;
 	minishell->out_redir = NULL;
 	minishell->in_redir = NULL;
 	minishell->append_mode = false;
@@ -336,23 +358,33 @@ void	handle_signals(void)
 int	check_existing_var(char *newvar, t_minishell *minishell)
 {
 	int		i;
+	int		j;
 	char	*env;
 	char	*path;
 	char	*target;
+	bool	join;
 
 	i = 0;
+	j = 0;
 	env = NULL;
 	path = NULL;
 	target = NULL;
+	join = false;
 	while(newvar[i] && newvar[i] != '=')
 		i++;
-	env = ft_strndup(newvar, i);
+	if (newvar[i - 1] == '+')
+	{
+		join = true;
+		env = ft_strndup(newvar, i - 1);
+	}
+	else
+		env = ft_strndup(newvar, i);
 	path = ft_getenv(minishell, env);
 	if (path)
 	{
 		target = ft_strjoin(env, "=");
 		free(env);
-		env = ft_strjoin(target, path);
+		env = ft_strjoin(target, path); //perfect so far
 		free(target);
 		target = NULL;
 		free(path);
@@ -363,7 +395,17 @@ int	check_existing_var(char *newvar, t_minishell *minishell)
 			if (ft_strncmp(env, minishell->env[i], ft_strlen(env)) == 0)
 			{
 				free(minishell->env[i]);
-				minishell->env[i] = ft_strdup(newvar);
+				if (join)
+				{
+					while(newvar[j] != '=')
+						j++;
+					path = ft_strjoin(env, newvar + j + 1);
+					minishell->env[i] = ft_strdup(path);
+					free(path);
+					path = NULL;
+				}
+				else
+					minishell->env[i] = ft_strdup(newvar);
 				free(env);
 				env = NULL;
 				return (i);
@@ -374,4 +416,64 @@ int	check_existing_var(char *newvar, t_minishell *minishell)
 	free(env);
 	env = NULL;
 	return (-1);
+}
+
+void	handle_shlvl(t_minishell *minishell, char sign)
+{
+	char	*num;
+	char	**newenv;
+	int		i;
+
+	num = NULL;
+	num = ft_getenv(minishell, "SHLVL");
+	i = -1;
+	newenv = NULL;
+	if (!num || !ft_isnumber(num))
+	{
+		while (minishell->env[++i] != NULL)
+			;
+		newenv = malloc(sizeof(char *) * (i + 2));
+		newenv[i + 1] = NULL;
+		newenv[i] = ft_strdup("SHLVL=1");
+		while (--i >= 0)
+			newenv[i] = ft_strdup(minishell->env[i]);
+		swap_vars(newenv);
+		free_arr(minishell->env);
+		minishell->env = newenv;
+		if (num)
+		{
+			free(num);
+			num = NULL;
+		}
+		return ;
+	}
+	i = ft_atoi(num);
+	if (sign == '+')
+		i++;
+	else
+		i--;
+	free(num);
+	num = ft_itoa(i);
+	replace_env(minishell, num, "SHLVL=");
+	free(num);
+	num = NULL;
+}
+
+bool	check_nl(char *content)
+{
+	int	i;
+
+	i = 0;
+	if (content[i] == '\0')
+		return (false);
+	while (content[i])
+	{
+		if (i == 0 && content[i] == '-')
+			i++;
+		else if (content[i] == 'n')
+			i++;
+		else
+			return (false);
+	}
+	return (true);
 }

@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 13:32:53 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/25 18:27:57 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/28 15:32:06 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,5 +33,6 @@ bool    check_builtin(t_minishell *minishell);
 int		handle_heredoc(t_tokens **token_lst, t_minishell *minishell);
 void	free_table(t_minishell *minishell);
 void	free_cmd(t_command *cmd);
+int    	ft_strcmp(char *s1, char *s2);
 
 #endif
