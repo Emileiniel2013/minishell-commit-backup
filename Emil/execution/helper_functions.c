@@ -6,13 +6,13 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 15:36:41 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/28 17:38:51 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/28 20:26:46 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/executor.h"
 
-void	replace_env(t_minishell *minishell, char *path, char *env)
+void	replace_env(t_mini *mini, char *path, char *env)
 {
 	int		i;
 	size_t	size;
@@ -22,10 +22,10 @@ void	replace_env(t_minishell *minishell, char *path, char *env)
 	i = 0;
 	found_env = false;
 	newenv = NULL;
-	while (minishell->env[i])
+	while (mini->env[i])
 	{
-		size = ft_strlen(minishell->env[i]);
-		if (ft_strnstr(minishell->env[i], env, size) != NULL)
+		size = ft_strlen(mini->env[i]);
+		if (ft_strnstr(mini->env[i], env, size) != NULL)
 		{
 			found_env = true;
 			break;
@@ -34,8 +34,8 @@ void	replace_env(t_minishell *minishell, char *path, char *env)
 	}
 	if (found_env)
 	{
-		free(minishell->env[i]);
-		minishell->env[i] = ft_strjoin(env, path);
+		free(mini->env[i]);
+		mini->env[i] = ft_strjoin(env, path);
 	}
 	else
 	{
@@ -43,10 +43,10 @@ void	replace_env(t_minishell *minishell, char *path, char *env)
 		newenv[i + 1] = NULL;
 		newenv[i] = ft_strjoin(env, path);
 		while (--i >= 0)
-			newenv[i] = ft_strdup(minishell->env[i]);
+			newenv[i] = ft_strdup(mini->env[i]);
 		swap_vars(newenv);
-		free_arr(minishell->env);
-		minishell->env = newenv;
+		free_arr(mini->env);
+		mini->env = newenv;
 	}
 }
 
@@ -77,13 +77,13 @@ void	swap_vars(char **newenv)
 	newenv[i - 2] = temp;
 }
 
-char	**list2array(t_minishell *minishell)
+char	**list2array(t_mini *mini)
 {
-	int			i;
-	t_command	*cmd;
-	char		**arg_arr;
+	int		i;
+	t_cmd	*cmd;
+	char	**arg_arr;
 
-	cmd = minishell->table->simple_command;
+	cmd = mini->table->command;
 	arg_arr = NULL;
 	i = 0;
 	while (cmd != NULL)
@@ -93,7 +93,7 @@ char	**list2array(t_minishell *minishell)
 	}
 	arg_arr = malloc(sizeof(char *) * (i + 1));
 	arg_arr[i] = NULL;
-	cmd = minishell->table->simple_command;
+	cmd = mini->table->command;
 	i = -1;
 	while (cmd != NULL)
 	{
@@ -103,33 +103,33 @@ char	**list2array(t_minishell *minishell)
 	return (arg_arr);
 }
 
-char	*ft_getcwd(t_minishell *minishell)
+char	*ft_getcwd(t_mini *mini)
 {
 	int		i;
 	char	*cwd;
 
 	i = -1;
 	cwd = NULL;
-	while (minishell->env[++i])
+	while (mini->env[++i])
 	{
-		if(ft_strncmp(minishell->env[i], "PWD=", 4) == 0)
+		if(ft_strncmp(mini->env[i], "PWD=", 4) == 0)
 		{
-			cwd = ft_strdup(minishell->env[i] + 4);
+			cwd = ft_strdup(mini->env[i] + 4);
 			return (cwd);
 		}
 	}
 	return (NULL);
 }
 
-char	**create_arg_lst(t_minishell *minishell)
+char	**create_arg_lst(t_mini *mini)
 {
 	int			i;
-	t_command	*arg_lst;
+	t_cmd	*arg_lst;
 	char		**arg_arr;
 
 	i = 0;
 	arg_arr = NULL;
-	arg_lst = minishell->table->simple_command;
+	arg_lst = mini->table->command;
 	if (arg_lst)
 	{
 		while(arg_lst)
@@ -140,7 +140,7 @@ char	**create_arg_lst(t_minishell *minishell)
 		arg_arr = malloc (sizeof(char *) * (i + 1));
 		arg_arr[i] = NULL;
 		i = 0;
-		arg_lst = minishell->table->simple_command;
+		arg_lst = mini->table->command;
 		while(arg_lst)
 		{
 			arg_arr[i] = ft_strdup(arg_lst->content);
@@ -151,7 +151,7 @@ char	**create_arg_lst(t_minishell *minishell)
 	return (arg_arr);
 }
 
-char	*ft_check_var_lst(t_minishell *minishell, char *var)
+char	*ft_check_var_lst(t_mini *mini, char *var)
 {
 	int		i;
 	size_t	len;
@@ -160,24 +160,24 @@ char	*ft_check_var_lst(t_minishell *minishell, char *var)
 	i = -1;
 	new_var = NULL;
 	len = ft_strlen(var);
-	if (!minishell->var_lst)
+	if (!mini->var_lst)
 		return (NULL);
-	while(minishell->var_lst[++i])
+	while(mini->var_lst[++i])
 	{
-		if (ft_strncmp(minishell->var_lst[i], var, len) == 0 && minishell->var_lst[i][len] == '=')
+		if (ft_strncmp(mini->var_lst[i], var, len) == 0 && mini->var_lst[i][len] == '=')
 		{
-			new_var = ft_strdup(minishell->var_lst[i]);
-			free(minishell->var_lst[i]);
-			while(minishell->var_lst[i + 1])
+			new_var = ft_strdup(mini->var_lst[i]);
+			free(mini->var_lst[i]);
+			while(mini->var_lst[i + 1])
 			{
-				minishell->var_lst[i] = minishell->var_lst[i + 1];
+				mini->var_lst[i] = mini->var_lst[i + 1];
 				i++;
 			}
-			minishell->var_lst[i] = NULL;
+			mini->var_lst[i] = NULL;
 			if (i == 0)
 			{
-				free(minishell->var_lst);
-				minishell->var_lst = NULL;
+				free(mini->var_lst);
+				mini->var_lst = NULL;
 			}
 			return (new_var);
 		}
@@ -185,124 +185,124 @@ char	*ft_check_var_lst(t_minishell *minishell, char *var)
 	return (new_var);
 }
 
-void	add_var_to_list(t_minishell *minishell)
+void	add_var_to_list(t_mini *mini)
 {
 	int		i;
 	char	**var_lst;
 
 	i = 0;
-	if (minishell->var_lst)
+	if (mini->var_lst)
 	{
-		while (minishell->var_lst[i])
+		while (mini->var_lst[i])
 			i++;
 	}
 	if (i == 0)
 	{
 		var_lst = malloc(sizeof(char *) * 2);
-		var_lst[0] = ft_strdup(minishell->table->simple_command->content);
+		var_lst[0] = ft_strdup(mini->table->command->content);
 		var_lst[1] = NULL;
-		minishell->var_lst = var_lst;
+		mini->var_lst = var_lst;
 	}
 	else
 	{
 		var_lst = malloc(sizeof(char *) * (i + 2));
 		var_lst[i + 1] = NULL;
-		var_lst[i] = ft_strdup(minishell->table->simple_command->content);
+		var_lst[i] = ft_strdup(mini->table->command->content);
 		while (--i >= 0)
-			var_lst[i] = ft_strdup(minishell->var_lst[i]);
-		free_arr(minishell->var_lst);
-		minishell->var_lst = var_lst;
+			var_lst[i] = ft_strdup(mini->var_lst[i]);
+		free_arr(mini->var_lst);
+		mini->var_lst = var_lst;
 	}
 }
 
-int	handle_redirections(t_minishell *minishell)
+int	handle_redirections(t_mini *mini)
 {
 	int	fd;
 
-	if (minishell->in_redir)
+	if (mini->in_redir)
 	{
-		fd = open(minishell->in_redir, O_RDONLY);
+		fd = open(mini->in_redir, O_RDONLY);
 		if (fd < 0)
 		{
-			write(STDERR_FILENO, "Minishell: ", 11);
-			write(STDERR_FILENO, minishell->in_redir, ft_strlen(minishell->in_redir));
+			write(STDERR_FILENO, "mini: ", 11);
+			write(STDERR_FILENO, mini->in_redir, ft_strlen(mini->in_redir));
 			write(STDERR_FILENO, ": No such file or directory\n", 29);
-			minishell->exit_code = 6;
-			minishell->success = false;
-			minishell->infd = fd;
+			mini->exit_code = 6;
+			mini->success = false;
+			mini->infd = fd;
 			return (-1);
 		}
-		minishell->infd = fd;
+		mini->infd = fd;
 	}
-	if (minishell->out_redir)
+	if (mini->out_redir)
 	{
-		if (minishell->append_mode == true)
+		if (mini->append_mode == true)
 		{
-			fd = open(minishell->out_redir, O_WRONLY | O_CREAT | O_APPEND, 0644);
-			minishell->append_mode = false;
+			fd = open(mini->out_redir, O_WRONLY | O_CREAT | O_APPEND, 0644);
+			mini->append_mode = false;
 		}
 		else
-			fd = open(minishell->out_redir, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+			fd = open(mini->out_redir, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		if (fd < 0)
 		{
-			write(STDERR_FILENO, "Minishell: Error opening output file\n", 38);
-			minishell->exit_code = 7;
-			minishell->success = false;
-			minishell->outfd = fd;
+			write(STDERR_FILENO, "mini: Error opening output file\n", 38);
+			mini->exit_code = 7;
+			mini->success = false;
+			mini->outfd = fd;
 			return (-1);
 		}
-		minishell->outfd = fd;
+		mini->outfd = fd;
 	}
 	return (0);
 }
 
-void	restore_redirections(t_minishell *minishell)
+void	restore_redirections(t_mini *mini)
 {
-	if (minishell->in_redir)
+	if (mini->in_redir)
 	{
-		if (minishell->infd > 0)
-			close(minishell->infd);
-		minishell->infd = STDIN_FILENO;
-		free(minishell->in_redir);
-		minishell->in_redir = NULL;
+		if (mini->infd > 0)
+			close(mini->infd);
+		mini->infd = STDIN_FILENO;
+		free(mini->in_redir);
+		mini->in_redir = NULL;
 	}
-	if (minishell->out_redir)
+	if (mini->out_redir)
 	{
-		if (minishell->outfd > 0)
-			close(minishell->outfd);
-		minishell->outfd = STDOUT_FILENO;
-		free(minishell->out_redir);
-		minishell->out_redir = NULL;
+		if (mini->outfd > 0)
+			close(mini->outfd);
+		mini->outfd = STDOUT_FILENO;
+		free(mini->out_redir);
+		mini->out_redir = NULL;
 	}
 	if (open(".heredoc_tmp", O_RDONLY, 0644) > 0)
 		unlink(".heredoc_tmp");
-	if (minishell->success)
-		minishell->exit_code = 0;
+	if (mini->success)
+		mini->exit_code = 0;
 	else
-		minishell->success = true;
+		mini->success = true;
 }
 
-t_minishell	*init_mini_vars(int argc, char **argv, char **envp)
+t_mini	*init_mini_vars(int argc, char **argv, char **envp)
 {
-	t_minishell	*minishell;
+	t_mini	*mini;
 	char		**envp_cpy;
 
 	(void)argc;
 	(void)argv;
-	minishell = malloc(sizeof(t_minishell));
+	mini = malloc(sizeof(t_mini));
 	envp_cpy = copy_env(envp);
-	minishell->env = envp_cpy;
-	minishell->var_lst = NULL;
-	minishell->table = NULL;
-	minishell->table_head = NULL;
-	minishell->out_redir = NULL;
-	minishell->in_redir = NULL;
-	minishell->append_mode = false;
-	minishell->infd = STDIN_FILENO;
-	minishell->outfd = STDOUT_FILENO;
-	minishell->exit_code = 0;
-	minishell->success = true;
-	return (minishell);
+	mini->env = envp_cpy;
+	mini->var_lst = NULL;
+	mini->table = NULL;
+	mini->table_head = NULL;
+	mini->out_redir = NULL;
+	mini->in_redir = NULL;
+	mini->append_mode = false;
+	mini->infd = STDIN_FILENO;
+	mini->outfd = STDOUT_FILENO;
+	mini->exit_code = 0;
+	mini->success = true;
+	return (mini);
 }
 
 bool	ft_isnumber(char *content)
@@ -317,26 +317,26 @@ bool	ft_isnumber(char *content)
 	return (true);
 }
 
-void	free_minishell(t_minishell *minishell, bool keep_env)
+void	free_mini(t_mini *mini, bool keep_env)
 {
-	if (minishell->table_head)
-		free_table(minishell);
-	if (minishell->env && !keep_env)
-		free_arr(minishell->env);
-	if (minishell->var_lst)
-		free_arr(minishell->var_lst);
-	if (minishell->in_redir)
+	if (mini->table_head)
+		free_table(mini);
+	if (mini->env && !keep_env)
+		free_arr(mini->env);
+	if (mini->var_lst)
+		free_arr(mini->var_lst);
+	if (mini->in_redir)
 	{
-		free(minishell->in_redir);
-		minishell->in_redir = NULL;
+		free(mini->in_redir);
+		mini->in_redir = NULL;
 	}
-	if (minishell->out_redir)
+	if (mini->out_redir)
 	{
-		free(minishell->out_redir);
-		minishell->out_redir = NULL;
+		free(mini->out_redir);
+		mini->out_redir = NULL;
 	}
-	free(minishell);
-	minishell = NULL;
+	free(mini);
+	mini = NULL;
 }
 
 void	sigint_handler(int sig)
@@ -355,7 +355,7 @@ void	handle_signals(void)
 	signal(SIGINT, sigint_handler);
 }
 
-int	check_existing_var(char *newvar, t_minishell *minishell)
+int	check_existing_var(char *newvar, t_mini *mini)
 {
 	int		i;
 	int		j;
@@ -379,7 +379,7 @@ int	check_existing_var(char *newvar, t_minishell *minishell)
 	}
 	else
 		env = ft_strndup(newvar, i);
-	path = ft_getenv(minishell, env);
+	path = ft_getenv(mini, env);
 	if (path)
 	{
 		target = ft_strjoin(env, "=");
@@ -390,22 +390,22 @@ int	check_existing_var(char *newvar, t_minishell *minishell)
 		free(path);
 		path = NULL;
 		i = 0;
-		while(minishell->env[i])
+		while(mini->env[i])
 		{
-			if (ft_strncmp(env, minishell->env[i], ft_strlen(env)) == 0)
+			if (ft_strncmp(env, mini->env[i], ft_strlen(env)) == 0)
 			{
-				free(minishell->env[i]);
+				free(mini->env[i]);
 				if (join)
 				{
 					while(newvar[j] != '=')
 						j++;
 					path = ft_strjoin(env, newvar + j + 1);
-					minishell->env[i] = ft_strdup(path);
+					mini->env[i] = ft_strdup(path);
 					free(path);
 					path = NULL;
 				}
 				else
-					minishell->env[i] = ft_strdup(newvar);
+					mini->env[i] = ft_strdup(newvar);
 				free(env);
 				env = NULL;
 				return (i);
@@ -418,28 +418,28 @@ int	check_existing_var(char *newvar, t_minishell *minishell)
 	return (-1);
 }
 
-void	handle_shlvl(t_minishell *minishell, char sign)
+void	handle_shlvl(t_mini *mini, char sign)
 {
 	char	*num;
 	char	**newenv;
 	int		i;
 
 	num = NULL;
-	num = ft_getenv(minishell, "SHLVL");
+	num = ft_getenv(mini, "SHLVL");
 	i = -1;
 	newenv = NULL;
 	if (!num || !ft_isnumber(num))
 	{
-		while (minishell->env[++i] != NULL)
+		while (mini->env[++i] != NULL)
 			;
 		newenv = malloc(sizeof(char *) * (i + 2));
 		newenv[i + 1] = NULL;
 		newenv[i] = ft_strdup("SHLVL=1");
 		while (--i >= 0)
-			newenv[i] = ft_strdup(minishell->env[i]);
+			newenv[i] = ft_strdup(mini->env[i]);
 		swap_vars(newenv);
-		free_arr(minishell->env);
-		minishell->env = newenv;
+		free_arr(mini->env);
+		mini->env = newenv;
 		if (num)
 		{
 			free(num);
@@ -454,7 +454,7 @@ void	handle_shlvl(t_minishell *minishell, char sign)
 		i--;
 	free(num);
 	num = ft_itoa(i);
-	replace_env(minishell, num, "SHLVL=");
+	replace_env(mini, num, "SHLVL=");
 	free(num);
 	num = NULL;
 }

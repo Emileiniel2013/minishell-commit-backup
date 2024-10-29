@@ -6,45 +6,45 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 11:41:14 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/28 17:23:37 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/28 20:23:33 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/executor.h"
 
-void	executor(t_minishell *minishell)
+void	executor(t_mini *mini)
 {
 	char	*content;
 
-	content = minishell->table->simple_command->content;
-	if (minishell->table != NULL)
+	content = mini->table->command->content;
+	if (mini->table != NULL)
 	{
 		if (ft_strcmp(content, "echo") == 0)
-			handle_echo(minishell);
+			handle_echo(mini);
 		else if (ft_strcmp(content, "pwd") == 0)
-			handle_pwd(minishell);
+			handle_pwd(mini);
 		else if (ft_strcmp(content, "cd") == 0)
-			handle_cd(minishell);
+			handle_cd(mini);
 		else if (ft_strcmp(content, "env") == 0)
-			handle_env(minishell);
+			handle_env(mini);
 		else if (ft_strcmp(content, "export") == 0)
-			handle_export(minishell);
+			handle_export(mini);
 		else if (ft_strcmp(content, "unset") == 0)
-			handle_unset(minishell);
+			handle_unset(mini);
 		else if (ft_strcmp(content, "exit") == 0)
-			handle_exit(minishell);
+			handle_exit(mini);
 		else if ((ft_strncmp (content, "./", 2)) == 0)
-			execute_file(minishell);
+			execute_file(mini);
 		else if (ft_strchr(content + 1, '=') != NULL)
-			add_var_to_list(minishell);
+			add_var_to_list(mini);
 		else if (content[0] == '\0')
 			printf("\n");
 		else
-			check_path(minishell);
+			check_path(mini);
 	}
 }
 
-void	mini_main(t_minishell *minishell)
+void	mini_main(t_mini *mini)
 {
 	int	pipefd[2];
 	int	prevpipefd;
@@ -53,61 +53,61 @@ void	mini_main(t_minishell *minishell)
 
 	status = 0;
 	prevpipefd = -1;
-	while(minishell->table)
+	while(mini->table)
 	{
-		if (minishell->table->rightpipe)
+		if (mini->table->rightpipe)
 			pipe(pipefd);
-		handle_shlvl(minishell, '+');
+		handle_shlvl(mini, '+');
 		pid = fork();
 		if (pid == 0)
 		{
-			if (minishell->table->leftpipe)
+			if (mini->table->leftpipe)
 			{
 				dup2(prevpipefd, STDIN_FILENO);
 				close(prevpipefd);
 			}
-			else if (!minishell->table->leftpipe && minishell->in_redir)
-				dup2(minishell->infd, STDIN_FILENO);
-			if (minishell->table->rightpipe)
+			else if (!mini->table->leftpipe && mini->in_redir)
+				dup2(mini->infd, STDIN_FILENO);
+			if (mini->table->rightpipe)
 			{
 				dup2(pipefd[1], STDOUT_FILENO);
 				close(pipefd[0]);
 				close(pipefd[1]);
 			}
-			else if (!minishell->table->rightpipe && minishell->out_redir)
-				dup2(minishell->outfd, STDOUT_FILENO);
-			executor(minishell);
-			if (minishell->success)
+			else if (!mini->table->rightpipe && mini->out_redir)
+				dup2(mini->outfd, STDOUT_FILENO);
+			executor(mini);
+			if (mini->success)
 			{
-				free_minishell(minishell, false);
+				free_mini(mini, false);
 				exit(EXIT_SUCCESS);
 			}
 			else
 			{
-				status = minishell->exit_code;
-				free_minishell(minishell, false);
+				status = mini->exit_code;
+				free_mini(mini, false);
 				exit(status);
 			}
 		}
 		signal(SIGINT, SIG_IGN);
 		waitpid(pid, &status, 0);
-		handle_shlvl(minishell, '-');
+		handle_shlvl(mini, '-');
 		signal(SIGINT, sigint_handler);
 		if (WIFEXITED(status))
 		{
 			if (WEXITSTATUS(status) != 0)
 			{
-				minishell->exit_code = WEXITSTATUS(status);
-				minishell->success = false;
+				mini->exit_code = WEXITSTATUS(status);
+				mini->success = false;
 			}
 		}
-		if (minishell->table->leftpipe)
+		if (mini->table->leftpipe)
 			close(prevpipefd);
-		if (minishell->table->rightpipe)
+		if (mini->table->rightpipe)
 			prevpipefd = pipefd[0];
-		if (minishell->table->leftpipe || minishell->table->rightpipe)
+		if (mini->table->leftpipe || mini->table->rightpipe)
 			close(pipefd[1]);
-		minishell->table = minishell->table->next;
+		mini->table = mini->table->next;
 	}
 	if (prevpipefd != -1)
 		close(pipefd[0]);

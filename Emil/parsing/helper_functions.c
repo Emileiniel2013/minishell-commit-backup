@@ -6,13 +6,13 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 15:13:00 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/28 16:44:14 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/29 12:35:44 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/parser.h"
 
-char	*check_string(char **content, t_minishell *minishell)
+char	*check_string(char **content, t_mini *mini)
 {
 	int		i;
 	int		j;
@@ -33,7 +33,7 @@ char	*check_string(char **content, t_minishell *minishell)
 	i++;
 	if ((*content)[i] == '?')
 	{
-		temp = ft_itoa(minishell->exit_code);
+		temp = ft_itoa(mini->exit_code);
 		i++;
 	}
 	else
@@ -44,7 +44,7 @@ char	*check_string(char **content, t_minishell *minishell)
 			j++;
 		}
 		temp2 = ft_strndup((*content) + (i - j), j);
-		temp = ft_getenv(minishell, temp2);
+		temp = ft_getenv(mini, temp2);
 		free(temp2);
 		temp2 = NULL;
 	}
@@ -71,7 +71,7 @@ char	*check_string(char **content, t_minishell *minishell)
 	return (expanded_env);
 }
 
-char	*ft_getenv(t_minishell *minishell, char	*env)
+char	*ft_getenv(t_mini *mini, char	*env)
 {
 	size_t	i;
 	int		len;
@@ -80,11 +80,11 @@ char	*ft_getenv(t_minishell *minishell, char	*env)
 	len = ft_strlen(env);
 	i = -1;
 	var = NULL;
-	while(minishell->env[++i])
+	while(mini->env[++i])
 	{
-		if(ft_strncmp(minishell->env[i], env, len) == 0 && minishell->env[i][len] == '=')
+		if(ft_strncmp(mini->env[i], env, len) == 0 && mini->env[i][len] == '=')
 		{
-			var = ft_strdup(minishell->env[i] + (len + 1));
+			var = ft_strdup(mini->env[i] + (len + 1));
 			return (var);
 		}
 	}
@@ -119,14 +119,14 @@ char	**copy_env(char **envp)
 }
 
 
-void	expand_env_vars(char **content, t_minishell *minishell)
+void	expand_env_vars(char **content, t_mini *mini)
 {
 	char	*expanded_env;
 
 	expanded_env = NULL;
 	while (1)
 	{
-		expanded_env = check_string(content, minishell);
+		expanded_env = check_string(content, mini);
 		if (!expanded_env)
 			break ;
 		else
@@ -139,122 +139,122 @@ void	expand_env_vars(char **content, t_minishell *minishell)
 	}
 }
 
-int	check_valid_redir_input(t_tokens **token_lst, t_minishell *minishell)
+int	check_valid_redir_input(t_tkn_lst **token_lst, t_mini *mini)
 {
 	if ((*token_lst)->next == NULL)
 	{
-		write(STDERR_FILENO, "Minishell: syntax error near unexpected token `newline'\n", 56);
-		minishell->exit_code = 8;
-		minishell->success = false;
+		write(STDERR_FILENO, "mini: syntax error near unexpected token `newline'\n", 56);
+		mini->exit_code = 8;
+		mini->success = false;
 		return (-1);
 	}
-	else if ((*token_lst)->next->token != TOKEN_STRING)
+	else if ((*token_lst)->next->token != STRING)
 	{
-		write(STDERR_FILENO, "Minishell: syntax error near unexpected token `", 47);
+		write(STDERR_FILENO, "mini: syntax error near unexpected token `", 47);
 		write(STDERR_FILENO, (*token_lst)->next->content, ft_strlen((*token_lst)->next->content));
 		write(STDERR_FILENO, "'\n", 2);
-		minishell->exit_code = 9;
-		minishell->success = false;
+		mini->exit_code = 9;
+		mini->success = false;
 		return (-1);
 	}
-	if ((*token_lst)->token == TOKEN_REDIRECT_IN)
+	if ((*token_lst)->token == REDIRECT_IN)
 	{
-		if (minishell->in_redir)
-			free(minishell->in_redir);
-		minishell->in_redir = ft_strdup((*token_lst)->next->content);
-		(*token_lst)->next->token = TOKEN_FILENAME;
+		if (mini->in_redir)
+			free(mini->in_redir);
+		mini->in_redir = ft_strdup((*token_lst)->next->content);
+		(*token_lst)->next->token = FILENAME;
 	}
-	else if ((*token_lst)->token == TOKEN_REDIRECT_OUT || (*token_lst)->token == TOKEN_REDIRECT_OUT_APPEND)
+	else if ((*token_lst)->token == REDIRECT_OUT || (*token_lst)->token == REDIRECT_OUT_APPEND)
 	{
-		if (minishell->out_redir)
-			free(minishell->out_redir);
-		minishell->out_redir = ft_strdup((*token_lst)->next->content);
-		(*token_lst)->next->token = TOKEN_FILENAME;
+		if (mini->out_redir)
+			free(mini->out_redir);
+		mini->out_redir = ft_strdup((*token_lst)->next->content);
+		(*token_lst)->next->token = FILENAME;
 	}
-	if ((*token_lst)->token == TOKEN_REDIRECT_OUT_APPEND)
-		minishell->append_mode = true;
+	if ((*token_lst)->token == REDIRECT_OUT_APPEND)
+		mini->append_mode = true;
 	return (0);
 }
 
-int	check_valid_pipe(t_tokens *token_lst, t_command_table *table, t_minishell *minishell)
+int	check_valid_pipe(t_tkn_lst *token_lst, t_table *table, t_mini *mini)
 {
-	if (token_lst->token == TOKEN_PIPE && (!token_lst->next || token_lst->next->token != TOKEN_STRING))
+	if (token_lst->token == PIPE && (!token_lst->next || token_lst->next->token != STRING))
 	{
-		write(STDERR_FILENO, "Minishell: syntax error near unexpected token `newline'\n", 57);
-		minishell->exit_code = 10;
-		minishell->success = false;
+		write(STDERR_FILENO, "mini: syntax error near unexpected token `newline'\n", 57);
+		mini->exit_code = 10;
+		mini->success = false;
 		return (-1);
 	}
-	if (token_lst->token == TOKEN_PIPE && !table)
+	if (token_lst->token == PIPE && !table)
 	{
-		write(STDERR_FILENO, "Minishell: syntax error near unexpected token `|'\n", 51);
-		minishell->exit_code = 11;
-		minishell->success = false;
+		write(STDERR_FILENO, "mini: syntax error near unexpected token `|'\n", 51);
+		mini->exit_code = 11;
+		mini->success = false;
 		return (-1);
 	}
-	if (token_lst->token == TOKEN_PIPE && token_lst->next->token != TOKEN_STRING)
+	if (token_lst->token == PIPE && token_lst->next->token != STRING)
 	{
-		write(STDERR_FILENO, "Minishell: syntax error near unexpected token `newline'\n",57);
-		minishell->exit_code = 12;
-		minishell->success = false;
+		write(STDERR_FILENO, "mini: syntax error near unexpected token `newline'\n",57);
+		mini->exit_code = 12;
+		mini->success = false;
 		return (-1);
 	}
 	return (0);
 }
 
-void	add_token_to_table(t_command_table **table, t_tokens *token_lst)
+void	add_token_to_table(t_table **table, t_tkn_lst *token_lst)
 {
-	t_command_table *new_node;
-	t_command_table	*current_node;
+	t_table *new_node;
+	t_table	*current_node;
 
 	new_node = NULL;
 	current_node = NULL;
-	if (token_lst->token == TOKEN_STRING || token_lst->token == TOKEN_DOUBLE_QUOTE || token_lst->token == TOKEN_SINGLE_QUOTE)
+	if (token_lst->token == STRING || token_lst->token == DOUBLE_QUOTE || token_lst->token == SINGLE_QUOTE)
 	{
 		if (!(*table))
 		{
-			*table = malloc(sizeof(t_command_table));
+			*table = malloc(sizeof(t_table));
 			(*table)->leftpipe = false;
 			(*table)->rightpipe = false;
 			(*table)->next = NULL;
-			(*table)->simple_command = NULL;
+			(*table)->command = NULL;
 		}
 		current_node = *table;
 		while(current_node->next)
 			current_node = current_node->next;
-		if (!current_node->simple_command)
+		if (!current_node->command)
 		{
-			current_node->simple_command = malloc(sizeof(t_command));
-			current_node->simple_command->content = ft_strdup(token_lst->content);
-			current_node->simple_command->next = NULL;
-			current_node->cmd_head = current_node->simple_command;
+			current_node->command = malloc(sizeof(t_cmd));
+			current_node->command->content = ft_strdup(token_lst->content);
+			current_node->command->next = NULL;
+			current_node->cmd_head = current_node->command;
 		}
 		else
-			add_cmd_node(&current_node->simple_command, token_lst->content);
+			add_cmd_node(&current_node->command, token_lst->content);
 	}
-	else if (token_lst->token == TOKEN_PIPE)
+	else if (token_lst->token == PIPE)
 	{
 		current_node = *table;
 		while (current_node->next)
 			current_node = current_node->next;
 		current_node->rightpipe = true;
-		new_node = malloc(sizeof(t_command_table));
+		new_node = malloc(sizeof(t_table));
 		new_node->leftpipe = true;
 		new_node->rightpipe = false;
-		new_node->simple_command = NULL;
+		new_node->command = NULL;
 		new_node->next = NULL;
 		current_node->next = new_node;
 	}
 }
 
-void	add_cmd_node(t_command **cmd, char *content)
+void	add_cmd_node(t_cmd **cmd, char *content)
 {
-	t_command	*new_node;
-	t_command	*current_node;
+	t_cmd	*new_node;
+	t_cmd	*current_node;
 
 	new_node = NULL;
 	current_node = NULL;
-	new_node = malloc(sizeof(t_command)); //ERROR CHECK
+	new_node = malloc(sizeof(t_cmd)); //ERROR CHECK
 	new_node->content = ft_strdup(content);
 	new_node->next = NULL;
 	if (!(*cmd))
@@ -268,12 +268,12 @@ void	add_cmd_node(t_command **cmd, char *content)
 	}
 }
 
-bool    check_builtin(t_minishell *minishell)
+bool    check_builtin(t_mini *mini)
 {
 	char	*content;
 
-	content = minishell->table->simple_command->content;
-	if (minishell->table != NULL)
+	content = mini->table->command->content;
+	if (mini->table != NULL)
 	{
 		if (ft_strcmp(content, "echo") == 0)
 			return (true);
@@ -297,7 +297,7 @@ bool    check_builtin(t_minishell *minishell)
 	return (false);
 }
 
-int	handle_heredoc(t_tokens **token_lst, t_minishell *minishell)
+int	handle_heredoc(t_tkn_lst **token_lst, t_mini *mini)
 {
 	char	*delimiter;
 	char	*line;
@@ -307,30 +307,30 @@ int	handle_heredoc(t_tokens **token_lst, t_minishell *minishell)
 	fd = -1;
 	if (!(*token_lst)->next)
 	{
-		write(STDERR_FILENO, "Minishell: syntax error near unexpected token 'newline'\n", 57);
-		minishell->exit_code = 13;
-		minishell->success = false;
+		write(STDERR_FILENO, "mini: syntax error near unexpected token 'newline'\n", 57);
+		mini->exit_code = 13;
+		mini->success = false;
 		return (-1);
 	}
-	if ((*token_lst)->next->token != TOKEN_STRING)
+	if ((*token_lst)->next->token != STRING)
 	{
-		write(STDERR_FILENO, "Minishell: syntax error near unexpected token `", 47);
+		write(STDERR_FILENO, "mini: syntax error near unexpected token `", 47);
 		write(STDERR_FILENO, (*token_lst)->next->content, ft_strlen((*token_lst)->next->content));
 		write(STDERR_FILENO, "'\n", 3);
-		minishell->exit_code = 14;
-		minishell->success = false;
+		mini->exit_code = 14;
+		mini->success = false;
 		return (-1);
 	} 
 	else
-		(*token_lst)->next->token = TOKEN_DELIMITER;
+		(*token_lst)->next->token = DELIMITER;
 	
 	delimiter = ft_strdup((*token_lst)->next->content);
 	fd = open(".heredoc_tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (fd < 0)
 	{
-		write(STDERR_FILENO, "Minishell: Failed to create heredoc file\n", 42);
-		minishell->exit_code = 15;
-		minishell->success = false;
+		write(STDERR_FILENO, "mini: Failed to create heredoc file\n", 42);
+		mini->exit_code = 15;
+		mini->success = false;
 		return (-1);
 	}
 	while (1)
@@ -341,20 +341,20 @@ int	handle_heredoc(t_tokens **token_lst, t_minishell *minishell)
 		write(fd, line, strlen(line));
 		write(fd, "\n", 1);
 	}
-	minishell->in_redir = ft_strdup(".heredoc_tmp");
+	mini->in_redir = ft_strdup(".heredoc_tmp");
 	free(delimiter);
 	delimiter = NULL;
 	close(fd); 
 	return (0);
 }
 
-void	free_table(t_minishell *minishell)
+void	free_table(t_mini *mini)
 {
-	t_command_table *current;
-	t_command_table	*next;
+	t_table *current;
+	t_table	*next;
 
 	next = NULL;
-	current = minishell->table_head;
+	current = mini->table_head;
 	while (current)
 	{
 		next = current->next;
@@ -363,14 +363,14 @@ void	free_table(t_minishell *minishell)
 		free(current);
 		current = next;
 	}
-	minishell->table = NULL;
-	minishell->table_head = NULL;
+	mini->table = NULL;
+	mini->table_head = NULL;
 }
 
-void	free_cmd(t_command *cmd)
+void	free_cmd(t_cmd *cmd)
 {
-	t_command	*current;
-	t_command	*next;
+	t_cmd	*current;
+	t_cmd	*next;
 
 	current = cmd;
 	next = NULL;

@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 10:56:58 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/28 17:23:28 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/28 20:28:07 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,34 +19,34 @@
 # include <limits.h>
 
 
-void		executor(t_minishell *minishell);
-void		handle_echo(t_minishell *minishell);
-void		handle_pwd(t_minishell *minishell);
-void		handle_cd(t_minishell *minishell);
-void		handle_env(t_minishell *minishell);
-void		handle_export(t_minishell *minishell);
-void		handle_unset(t_minishell *minishell);
-void        handle_exit(t_minishell *minishell);
-void		execute_file(t_minishell *minishell);
-void		check_path(t_minishell *minishell);
-char		**list2array(t_minishell *minishell);
+void		executor(t_mini *mini);
+void		handle_echo(t_mini *mini);
+void		handle_pwd(t_mini *mini);
+void		handle_cd(t_mini *mini);
+void		handle_env(t_mini *mini);
+void		handle_export(t_mini *mini);
+void		handle_unset(t_mini *mini);
+void        handle_exit(t_mini *mini);
+void		execute_file(t_mini *mini);
+void		check_path(t_mini *mini);
+char		**list2array(t_mini *mini);
 void		free_arr(char **arr);
 void		swap_vars(char **newenv);
-void		replace_env(t_minishell *minishell, char *path, char *env);
-char		*ft_getcwd(t_minishell *minishell);
-char		**create_arg_lst(t_minishell *minishell);
-char		*ft_check_var_lst(t_minishell *minishell, char *var);
-void		add_var_to_list(t_minishell *minishell);
-void    	mini_main(t_minishell *minishell);
-int			handle_redirections(t_minishell *minishell);
-void		restore_redirections(t_minishell *minishell);
-t_minishell	*init_mini_vars(int argc, char **argv, char **envp);
+void		replace_env(t_mini *mini, char *path, char *env);
+char		*ft_getcwd(t_mini *mini);
+char		**create_arg_lst(t_mini *mini);
+char		*ft_check_var_lst(t_mini *mini, char *var);
+void		add_var_to_list(t_mini *mini);
+void    	mini_main(t_mini *mini);
+int			handle_redirections(t_mini *mini);
+void		restore_redirections(t_mini *mini);
+t_mini		*init_mini_vars(int argc, char **argv, char **envp);
 bool		ft_isnumber(char *content);
-void		free_minishell(t_minishell *minishell, bool keep_env);
+void		free_mini(t_mini *mini, bool keep_env);
 void        sigint_handler(int sig);
 void	    handle_signals(void);
-int         check_existing_var(char *newvar, t_minishell *minishell);
-void    	handle_shlvl(t_minishell *minishell, char sign);
+int         check_existing_var(char *newvar, t_mini *mini);
+void    	handle_shlvl(t_mini *mini, char sign);
 bool	    check_nl(char *content);
 
 #endif
