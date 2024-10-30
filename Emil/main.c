@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/02 17:50:07 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/29 12:41:34 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/29 12:58:15 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,29 +14,29 @@
 
 int	main(int argc, char *argv[], char *envp[])
 {
-	t_mini	*mini;
+	t_mini	*minish;
 	char	*line;
 
 	handle_signals();
-	mini = init_mini_vars(argc, argv, envp);
+	minish = init_mini_vars(argc, argv, envp);
 	while (1)
 	{
 		line = readline("Minishell $ ");
 		if (!line)
 			break ;
-		parse_input(line, mini);
+		parse_input(line, minish);
 		free(line);
-		if (mini->table && handle_redirections(mini) != -1)
+		if (minish->table && handle_redirections(minish) != -1)
 		{
-			if (!mini->table->rightpipe && check_builtin(mini))
-				executor(mini);
+			if (!minish->table->rightpipe && check_builtin(minish))
+				executor(minish);
 			else
-				mini_main(mini);
+				mini_main(minish);
 		}
-		restore_redirections(mini);
-		if (mini->table_head)
-			free_table(mini);
+		restore_redirections(minish);
+		if (minish->table_head)
+			free_table(minish);
 	}
-	free_mini(mini, false);
+	free_mini(minish, false);
 	return (0);
 }

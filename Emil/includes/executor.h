@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 10:56:58 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/28 20:28:07 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/30 17:20:00 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,5 +48,6 @@ void	    handle_signals(void);
 int         check_existing_var(char *newvar, t_mini *mini);
 void    	handle_shlvl(t_mini *mini, char sign);
 bool	    check_nl(char *content);
+bool		check_builtin(t_mini *minish);
 
 #endif

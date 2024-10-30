@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 14:43:06 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/29 12:41:18 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/30 12:58:02 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,16 +17,18 @@ t_tkn_lst	*process_input(char *line, t_mini *mini)
 	t_tkn_lst	*token_lst_head;
 	char		*content;
 	int			quote_type;
-	t_token		type;
+	t_tkn		type;
 
 	token_lst_head = NULL;
 	quote_type = 0;
+	if (line[0] != '\0')
+		add_history(line);
 	content = get_next_token(line, &quote_type, mini);
 	while (content != NULL)
 	{
 		if (content[0] == '\0')
 		{
-			free_token_lst(token_lst_head);
+			free_tkn_lst(token_lst_head);
 			return (NULL);
 		}
 		type = identify_token(content, quote_type);
@@ -68,7 +70,7 @@ char	*handle_quote(t_mini *mini, int *quote_type, int *index, char *line)
 	int		start;
 	char	*token;
 
-	set_q_type(quote_type, line[*index]);
+	set_quote_type(quote_type, line[*index]);
 	quote = line[(*index)++];
 	start = *index;
 	token = NULL;
@@ -82,13 +84,13 @@ char	*handle_quote(t_mini *mini, int *quote_type, int *index, char *line)
 	}
 	else
 	{
-		write_err(mini, 16);
+		write_err(mini, 16, NULL);
 		*index = 0;
 		return ("\0");
 	}
 }
 
-void	add_tkn_to_lst(t_tkn_lst **list_head, char *content, t_token token)
+void	add_tkn_to_lst(t_tkn_lst **list_head, char *content, t_tkn token)
 {
 	t_tkn_lst	*new_token;
 	t_tkn_lst	*current;

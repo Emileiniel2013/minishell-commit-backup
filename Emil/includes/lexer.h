@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 13:27:42 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/28 20:18:27 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/30 13:25:13 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,8 @@
 # include <sys/ioctl.h>
 # include <termios.h>
 # include <curses.h>
+# include <readline/readline.h>
+# include <readline/history.h>
 
 typedef enum token_type
 {
@@ -34,19 +36,19 @@ typedef enum token_type
 	SINGLE_QUOTE,
 	DOUBLE_QUOTE,
 	PIPE,
-	REDIRECT_IN,
-	REDIRECT_OUT,
-	REDIRECT_OUT_APPEND,
+	REDIRIN,
+	REDIROUT,
+	REDIROUTAPP,
 	HEREDOC,
 	DELIMITER,
 	STRING,
 	UNKNOWN
-}	t_token;
+}	t_tkn;
 
 typedef struct t_tokenizer
 {
 	char				*content;
-	t_token				token;
+	t_tkn				tkn;
 	struct t_tokenizer	*next;
 }		t_tkn_lst;
 
@@ -84,17 +86,17 @@ typedef struct t_minishell
 t_tkn_lst	*process_input(char *line, t_mini *mini);
 char		*get_next_token(char *line, int *q_type, t_mini *mini);
 char		*handle_quote(t_mini *mini, int *q_type, int *index, char *line);
-void		add_tkn_to_lst(t_tkn_lst **list_head, char *content, t_token token);
+void		add_tkn_to_lst(t_tkn_lst **list_head, char *content, t_tkn token);
 
 // HELPER FUNCTIONS
-void		set_q_type(int *q_type, char quote);
-t_token		identify_token(char *token, int q_type);
+void		set_quote_type(int *q_type, char quote);
+t_tkn		identify_token(char *token, int q_type);
 
 // UTILS
 bool		ft_isspace(char index);
 char		*ft_strndup(char *s1, size_t len);
-t_tkn_lst	*create_new_node(char *content, t_token token);
-void		free_token_lst(t_tkn_lst *token_lst);
-void		write_err(t_mini *mini, int err_code);
+t_tkn_lst	*create_new_node(char *content, t_tkn token);
+void		free_tkn_lst(t_tkn_lst *token_lst);
+void		write_err(t_mini *minish, int code, char *arg);
 
 #endif

@@ -6,19 +6,19 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 15:24:36 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/28 20:26:21 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/30 12:27:54 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/executor.h"
 
-void	handle_echo(t_mini *mini)	
+void	handle_echo(t_mini *minish)	
 {
 	t_cmd	*command_cpy;
 	bool	nl;
 
 	nl = true;
-	command_cpy = mini->table->command;
+	command_cpy = minish->table->command;
 	
 	if (command_cpy->next == NULL)
 		printf("\n");
@@ -42,18 +42,18 @@ void	handle_echo(t_mini *mini)
 	}
 }
 
-void	handle_pwd(t_mini *mini)
+void	handle_pwd(t_mini *minish)
 {
 	char	*line;
 	int		i;
 
 	line = NULL;
 	i = 0;
-	while (mini->env[i] != NULL)
+	while (minish->env[i] != NULL)
 	{
-		if (ft_strnstr(mini->env[i], "PWD=", 4) != NULL)
+		if (ft_strnstr(minish->env[i], "PWD=", 4) != NULL)
 		{
-			line = ft_strdup(mini->env[i]);
+			line = ft_strdup(minish->env[i]);
 			i = 4;
 			while (line[i])
 			{
@@ -72,7 +72,7 @@ void	handle_pwd(t_mini *mini)
 	free(line);
 }
 
-void	handle_cd(t_mini *mini)
+void	handle_cd(t_mini *minish)
 {
 	char	*path;
 	char	*temp;
@@ -82,17 +82,17 @@ void	handle_cd(t_mini *mini)
 	path = NULL;
 	temp = NULL;
 	i = 0;
-	if (mini->table->command->next)
-		path = mini->table->command->next->content;
+	if (minish->table->command->next)
+		path = minish->table->command->next->content;
 	getcwd(cwd, sizeof(cwd)); 
 	if (!path || ((ft_strncmp(path, "~", 1) == 0) && (ft_strlen(path) == 1)))
 	{
-		path = ft_getenv(mini, "HOME");
+		path = ft_getenv(minish, "HOME");
 		if (!path)
 		{
-			write(STDERR_FILENO, "mini: cd: HOME not set\n", 29);
-			mini->exit_code = 1;
-			mini->success = false;
+			write(STDERR_FILENO, "Minishell: cd: HOME not set\n", 29);
+			minish->exit_code = 1;
+			minish->success = false;
 			return ;
 		}
 		i = chdir(path);
@@ -101,22 +101,22 @@ void	handle_cd(t_mini *mini)
 	}
 	else if ((ft_strncmp(path, "-", 1) == 0) && (ft_strlen(path) == 1))
 	{
-		path = ft_getenv(mini, "OLDPWD");
+		path = ft_getenv(minish, "OLDPWD");
 		if (!path)
 		{
-			write(STDERR_FILENO, "mini: cd: OLDPWD not set\n", 31);
-			mini->exit_code = 21;
-			mini->success = false;
+			write(STDERR_FILENO, "Minishell: cd: OLDPWD not set\n", 31);
+			minish->exit_code = 21;
+			minish->success = false;
 			return ;
 		}
 		i = chdir(path);
 		if (i != 0)
 		{
-			write(STDERR_FILENO, "mini: cd: ", 15);
+			write(STDERR_FILENO, "Minishell: cd: ", 15);
 			write(STDERR_FILENO, path, ft_strlen(path));
 			write(STDERR_FILENO, ": No such file or directory\n", 29);
-			mini->exit_code = 2;
-			mini->success = false;
+			minish->exit_code = 2;
+			minish->success = false;
 			free(path);
 			path = NULL;
 			return ;
@@ -126,12 +126,12 @@ void	handle_cd(t_mini *mini)
 	}
 	else if ((ft_strncmp(path, "~", 1) == 0) && (ft_strlen(path) != 1))
 	{
-		temp =	ft_getenv(mini, "HOME");
+		temp =	ft_getenv(minish, "HOME");
 		if (!temp)
 		{
-			write(STDERR_FILENO, "mini: cd: HOME not set\n", 29);
-			mini->exit_code = 1;
-			mini->success = false;
+			write(STDERR_FILENO, "Minishell: cd: HOME not set\n", 29);
+			minish->exit_code = 1;
+			minish->success = false;
 			return ;
 		}
 		path = ft_strjoin(temp, path + 1);
@@ -140,11 +140,11 @@ void	handle_cd(t_mini *mini)
 		i = chdir(path);
 		if (i != 0)
 		{
-			write(STDERR_FILENO, "mini: cd: ", 15);
+			write(STDERR_FILENO, "Minishell: cd: ", 15);
 			write(STDERR_FILENO, path, ft_strlen(path));
 			write(STDERR_FILENO, ": No such file or directory\n", 29);
-			mini->exit_code = 2;
-			mini->success = false;
+			minish->exit_code = 2;
+			minish->success = false;
 			free(path);
 			path = NULL;
 			return ;
@@ -157,32 +157,32 @@ void	handle_cd(t_mini *mini)
 		i = chdir(path);
 		if (i != 0)
 		{
-			write(STDERR_FILENO, "mini: cd: ", 15);
+			write(STDERR_FILENO, "Minishell: cd: ", 15);
 			write(STDERR_FILENO, path, ft_strlen(path));
 			write(STDERR_FILENO, ": No such file or directory\n", 29);
-			mini->exit_code = 2;
-			mini->success = false;
+			minish->exit_code = 2;
+			minish->success = false;
 			return ;
 		}
 	}
-	replace_env(mini, cwd, "OLDPWD=");
+	replace_env(minish, cwd, "OLDPWD=");
 	getcwd(cwd, sizeof(cwd));
-	replace_env(mini, cwd, "PWD=");
+	replace_env(minish, cwd, "PWD=");
 }
 
-void	handle_env(t_mini *mini)
+void	handle_env(t_mini *minish)
 {
 	int	i;
 
 	i = 0;
-	while (mini->env[i] != NULL)
+	while (minish->env[i] != NULL)
 	{
-		printf("%s\n", mini->env[i]);
+		printf("%s\n", minish->env[i]);
 		i++;
 	}
 }
 
-void	handle_export(t_mini *mini)
+void	handle_export(t_mini *minish)
 {
 	char	**newenv;
 	int		i;
@@ -191,22 +191,22 @@ void	handle_export(t_mini *mini)
 	i = 0;
 	newenv = NULL;
 	newvar = NULL;
-	mini->table->command = mini->table->command->next;
-	if (!mini->table->command)
+	minish->table->command = minish->table->command->next;
+	if (!minish->table->command)
 	{
-		handle_env(mini);
+		handle_env(minish);
 		return;
 	}
-	if (ft_strchr(mini->table->command->content, '=') == NULL)
-		newvar = ft_check_var_lst(mini, mini->table->command->content);
+	if (ft_strchr(minish->table->command->content, '=') == NULL)
+		newvar = ft_check_var_lst(minish, minish->table->command->content);
 	else
-		newvar = ft_strdup(mini->table->command->content);
+		newvar = ft_strdup(minish->table->command->content);
 	if (newvar)
 	{
-		i = check_existing_var(newvar, mini);
+		i = check_existing_var(newvar, minish);
 		if (i == -1)
 		{
-			while (mini->env[++i] != NULL)
+			while (minish->env[++i] != NULL)
 				;
 			newenv = malloc(sizeof(char *) * (i + 2));
 			newenv[i + 1] = NULL;
@@ -214,10 +214,10 @@ void	handle_export(t_mini *mini)
 			free(newvar);
 			newvar = NULL;
 			while (--i >= 0)
-				newenv[i] = ft_strdup(mini->env[i]);
+				newenv[i] = ft_strdup(minish->env[i]);
 			swap_vars(newenv);
-			free_arr(mini->env);
-			mini->env = newenv;
+			free_arr(minish->env);
+			minish->env = newenv;
 		}
 		else
 		{
@@ -225,48 +225,48 @@ void	handle_export(t_mini *mini)
 			newvar = NULL;
 		}
 	}
-	if (mini->table->command->next != NULL)
-		handle_export(mini);
+	if (minish->table->command->next != NULL)
+		handle_export(minish);
 }
 
-void	handle_unset(t_mini *mini)
+void	handle_unset(t_mini *minish)
 {
 	int		i;
 	char	*var;
 	size_t	len;
 
 	i = 0;
-	mini->table->command = mini->table->command->next;
-	var = mini->table->command->content;
-	while (mini->env[i] != NULL)
+	minish->table->command = minish->table->command->next;
+	var = minish->table->command->content;
+	while (minish->env[i] != NULL)
 		i++;
 	while (--i >= 0)
 	{
 		len = ft_strlen(var);
-		if (ft_strncmp(mini->env[i], var, len) == 0 && mini->env[i][len] == '=')
+		if (ft_strncmp(minish->env[i], var, len) == 0 && minish->env[i][len] == '=')
 		{
-			free(mini->env[i]);
-			while (mini->env[i + 1])
+			free(minish->env[i]);
+			while (minish->env[i + 1])
 			{
-				mini->env[i] = mini->env[i + 1];
+				minish->env[i] = minish->env[i + 1];
 				i++;
 			}
-			mini->env[i] = NULL;	
+			minish->env[i] = NULL;	
 			break;
 		}
 	}
-	if (mini->table->command->next != NULL)
-		handle_unset(mini);
+	if (minish->table->command->next != NULL)
+		handle_unset(minish);
 }
 
-void        handle_exit(t_mini *mini)
+void        handle_exit(t_mini *minish)
 {
 	int	i;
 	t_cmd	*command_cpy;
-	char		*exit_code;
+	char	*exit_code;
 	
 	i = 0;
-	command_cpy = mini->table->command;
+	command_cpy = minish->table->command;
 	exit_code = NULL;
 	while(command_cpy)
 	{
@@ -275,35 +275,35 @@ void        handle_exit(t_mini *mini)
 	}
 	if (i > 2)
 	{
-		write(STDERR_FILENO, "mini: exit: too many arguments\n", 36);
-		mini->exit_code = 17;
-		mini->success = false;
+		write(STDERR_FILENO, "Minishell: exit: too many arguments\n", 36);
+		minish->exit_code = 17;
+		minish->success = false;
 		return ;
 	}
 	else if (i == 2)
 	{
-		if (ft_isnumber(mini->table->command->next->content))
+		if (ft_isnumber(minish->table->command->next->content))
 		{
-			mini->exit_code = ft_atoi(mini->table->command->next->content);
-			free_mini(mini, false);
-			exit(mini->exit_code);
+			minish->exit_code = ft_atoi(minish->table->command->next->content);
+			free_mini(minish, false);
+			exit(minish->exit_code);
 		}
 		else
 		{
-			exit_code = mini->table->command->next->content;
-			write(STDERR_FILENO, "mini: exit: ", 17);
+			exit_code = minish->table->command->next->content;
+			write(STDERR_FILENO, "Minishell: exit: ", 17);
 			write(STDERR_FILENO, exit_code, ft_strlen(exit_code));
 			write(STDERR_FILENO, ": numeric argument required\n", 29);
-			mini->exit_code = 18;
-			mini->success = false;
+			minish->exit_code = 18;
+			minish->success = false;
 			return ;
 		}
 	}
-	free_mini(mini, false);
+	free_mini(minish, false);
 	exit(EXIT_SUCCESS);
 }
 
-void	execute_file(t_mini *mini)
+void	execute_file(t_mini *minish)
 {
 	char	*path;
 	char	*filename;
@@ -312,26 +312,26 @@ void	execute_file(t_mini *mini)
 
 	arg_arr = NULL;
 	env = NULL;
-	filename = mini->table->command->content;
-	path = ft_strjoin(ft_getcwd(mini), filename + 1);
+	filename = minish->table->command->content;
+	path = ft_strjoin(ft_getcwd(minish), filename + 1);
 	if (access(path, X_OK) == 0)
 	{
-		arg_arr = create_arg_lst(mini);
-		env = mini->env;
-		free_mini(mini, true);
+		arg_arr = create_arg_lst(minish);
+		env = minish->env;
+		free_mini(minish, true);
 		execve(path, arg_arr, env);
 	}
 	else
 	{
-		write(STDERR_FILENO, "mini: ", 11);
+		write(STDERR_FILENO, "Minishell: ", 11);
 		write(STDERR_FILENO, filename, ft_strlen(filename));
 		write(STDERR_FILENO, ": No such file or directory\n", 29);
-		mini->exit_code = 3;
-		mini->success = false;
+		minish->exit_code = 3;
+		minish->success = false;
 	}
 }
 
-void	check_path(t_mini *mini)
+void	check_path(t_mini *minish)
 {
 	char	*path;
 	bool	valid_cmd;
@@ -346,25 +346,25 @@ void	check_path(t_mini *mini)
 	temp = NULL;
 	path = NULL;
 	paths = NULL;
-	if (access(mini->table->command->content, X_OK) == 0)
+	if (access(minish->table->command->content, X_OK) == 0)
 	{
-		path = ft_strdup(mini->table->command->content);
-		paths = list2array(mini);
-		env = mini->env;
-		free_mini(mini, true);
+		path = ft_strdup(minish->table->command->content);
+		paths = list2array(minish);
+		env = minish->env;
+		free_mini(minish, true);
 		execve(path, paths, env);
 	}
 	else
 	{
-		path = ft_getenv(mini, "PATH");
+		path = ft_getenv(minish, "PATH");
 		if (!path)
 		{
-			path = mini->table->command->content;
-			write(STDERR_FILENO, "mini: ", 11);
+			path = minish->table->command->content;
+			write(STDERR_FILENO, "Minishell: ", 11);
 			write(STDERR_FILENO, path, ft_strlen(path));
 			write(STDERR_FILENO, ": command not found\n", 21);
-			mini->exit_code = 4;
-			mini->success = false;
+			minish->exit_code = 4;
+			minish->success = false;
 			return ;
 		}
 		paths = ft_split(path, ':');
@@ -372,7 +372,7 @@ void	check_path(t_mini *mini)
 		while (paths[i] != NULL)
 		{
 			temp = ft_strjoin(paths[i], "/");
-			path = ft_strjoin(temp, mini->table->command->content);
+			path = ft_strjoin(temp, minish->table->command->content);
 			free(temp);
 			temp = NULL;
 			if (access(path, X_OK) == 0)
@@ -386,20 +386,20 @@ void	check_path(t_mini *mini)
 		if (valid_cmd == true)
 		{
 			free_arr(paths);
-			paths = list2array(mini);
-			env = mini->env;
-			free_mini(mini, true);
+			paths = list2array(minish);
+			env = minish->env;
+			free_mini(minish, true);
 			execve(path, paths, env);	
 		}
 		else
 		{
 			free_arr(paths);
-			path = mini->table->command->content;
-			write(STDERR_FILENO, "mini: ", 11);
+			path = minish->table->command->content;
+			write(STDERR_FILENO, "Minishell: ", 11);
 			write(STDERR_FILENO, path, ft_strlen(path));
 			write(STDERR_FILENO, ": command not found\n", 21);
-			mini->exit_code = 5;
-			mini->success = false;
+			minish->exit_code = 5;
+			minish->success = false;
 		}
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 15:36:41 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/28 20:26:46 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/30 17:19:26 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -476,4 +476,33 @@ bool	check_nl(char *content)
 			return (false);
 	}
 	return (true);
+}
+
+bool    check_builtin(t_mini *minish)
+{
+	char	*content;
+
+	content = minish->table->command->content;
+	if (minish->table != NULL)
+	{
+		if (ft_strcmp(content, "echo") == 0)
+			return (true);
+		else if (ft_strcmp(content, "pwd") == 0)
+			return (true);
+		else if (ft_strcmp(content, "cd") == 0)
+			return (true);
+		else if (ft_strcmp(content, "env") == 0)
+			return (true);
+		else if (ft_strcmp(content, "export") == 0)
+			return (true);
+		else if (ft_strcmp(content, "unset") == 0)
+			return (true);
+		else if (ft_strcmp(content, "exit") == 0)
+			return (true);
+		else if (ft_strchr(content + 1, '=') != NULL)
+			return (true);
+		else
+			return (false);
+		}
+	return (false);
 }

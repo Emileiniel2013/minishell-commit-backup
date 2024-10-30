@@ -6,45 +6,45 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 11:41:14 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/28 20:23:33 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/10/29 13:17:08 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/executor.h"
 
-void	executor(t_mini *mini)
+void	executor(t_mini *minish)
 {
 	char	*content;
 
-	content = mini->table->command->content;
-	if (mini->table != NULL)
+	content = minish->table->command->content;
+	if (minish->table != NULL)
 	{
 		if (ft_strcmp(content, "echo") == 0)
-			handle_echo(mini);
+			handle_echo(minish);
 		else if (ft_strcmp(content, "pwd") == 0)
-			handle_pwd(mini);
+			handle_pwd(minish);
 		else if (ft_strcmp(content, "cd") == 0)
-			handle_cd(mini);
+			handle_cd(minish);
 		else if (ft_strcmp(content, "env") == 0)
-			handle_env(mini);
+			handle_env(minish);
 		else if (ft_strcmp(content, "export") == 0)
-			handle_export(mini);
+			handle_export(minish);
 		else if (ft_strcmp(content, "unset") == 0)
-			handle_unset(mini);
+			handle_unset(minish);
 		else if (ft_strcmp(content, "exit") == 0)
-			handle_exit(mini);
+			handle_exit(minish);
 		else if ((ft_strncmp (content, "./", 2)) == 0)
-			execute_file(mini);
+			execute_file(minish);
 		else if (ft_strchr(content + 1, '=') != NULL)
-			add_var_to_list(mini);
+			add_var_to_list(minish);
 		else if (content[0] == '\0')
 			printf("\n");
 		else
-			check_path(mini);
+			check_path(minish);
 	}
 }
 
-void	mini_main(t_mini *mini)
+void	mini_main(t_mini *minish)
 {
 	int	pipefd[2];
 	int	prevpipefd;
@@ -53,61 +53,61 @@ void	mini_main(t_mini *mini)
 
 	status = 0;
 	prevpipefd = -1;
-	while(mini->table)
+	while(minish->table)
 	{
-		if (mini->table->rightpipe)
+		if (minish->table->rightpipe)
 			pipe(pipefd);
-		handle_shlvl(mini, '+');
+		handle_shlvl(minish, '+');
 		pid = fork();
 		if (pid == 0)
 		{
-			if (mini->table->leftpipe)
+			if (minish->table->leftpipe)
 			{
 				dup2(prevpipefd, STDIN_FILENO);
 				close(prevpipefd);
 			}
-			else if (!mini->table->leftpipe && mini->in_redir)
-				dup2(mini->infd, STDIN_FILENO);
-			if (mini->table->rightpipe)
+			else if (!minish->table->leftpipe && minish->in_redir)
+				dup2(minish->infd, STDIN_FILENO);
+			if (minish->table->rightpipe)
 			{
 				dup2(pipefd[1], STDOUT_FILENO);
 				close(pipefd[0]);
 				close(pipefd[1]);
 			}
-			else if (!mini->table->rightpipe && mini->out_redir)
-				dup2(mini->outfd, STDOUT_FILENO);
-			executor(mini);
-			if (mini->success)
+			else if (!minish->table->rightpipe && minish->out_redir)
+				dup2(minish->outfd, STDOUT_FILENO);
+			executor(minish);
+			if (minish->success)
 			{
-				free_mini(mini, false);
+				free_mini(minish, false);
 				exit(EXIT_SUCCESS);
 			}
 			else
 			{
-				status = mini->exit_code;
-				free_mini(mini, false);
+				status = minish->exit_code;
+				free_mini(minish, false);
 				exit(status);
 			}
 		}
 		signal(SIGINT, SIG_IGN);
 		waitpid(pid, &status, 0);
-		handle_shlvl(mini, '-');
+		handle_shlvl(minish, '-');
 		signal(SIGINT, sigint_handler);
 		if (WIFEXITED(status))
 		{
 			if (WEXITSTATUS(status) != 0)
 			{
-				mini->exit_code = WEXITSTATUS(status);
-				mini->success = false;
+				minish->exit_code = WEXITSTATUS(status);
+				minish->success = false;
 			}
 		}
-		if (mini->table->leftpipe)
+		if (minish->table->leftpipe)
 			close(prevpipefd);
-		if (mini->table->rightpipe)
+		if (minish->table->rightpipe)
 			prevpipefd = pipefd[0];
-		if (mini->table->leftpipe || mini->table->rightpipe)
+		if (minish->table->leftpipe || minish->table->rightpipe)
 			close(pipefd[1]);
-		mini->table = mini->table->next;
+		minish->table = minish->table->next;
 	}
 	if (prevpipefd != -1)
 		close(pipefd[0]);
