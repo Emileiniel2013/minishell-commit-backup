@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   builtins.c                                         :+:      :+:    :+:   */
+/*   builtin_commands.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 15:24:36 by temil-da          #+#    #+#             */
-/*   Updated: 2024/11/06 18:24:10 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/11/07 17:51:38 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,30 +14,30 @@
 
 void	handle_echo(t_mini *minish)
 {
-	t_cmd	*command_cpy;
+	t_cmd	*cpy;
 	bool	nl;
 
 	nl = true;
-	command_cpy = minish->table->command;
-	if (command_cpy->next == NULL)
+	cpy = minish->table->command;
+	if (cpy->next == NULL)
 		printf("\n");
 	else
 	{
-		if (check_nl(command_cpy->next->content))
+		if (check_nl(cpy->next->content))
 		{
 			nl = false;
-			command_cpy = command_cpy->next;
+			cpy = cpy->next;
 		}
-		command_cpy = command_cpy->next;
-		while (command_cpy != NULL)
+		cpy = cpy->next;
+		while (cpy != NULL)
 		{
-			printf("%s", command_cpy->content);
-			command_cpy = command_cpy->next;
-			if (command_cpy != NULL)
-				printf(" ");
+			write(minish->redirfd, cpy->content, ft_strlen(cpy->content));
+			cpy = cpy->next;
+			if (cpy != NULL)
+				write(minish->redirfd, " ", 1);
 		}
 		if (nl == true)
-			printf("\n");
+			write(minish->redirfd, "\n", 1);
 	}
 }
 
@@ -55,8 +55,8 @@ void	handle_pwd(t_mini *minish)
 			line = ft_strdup(minish->env[i]);
 			i = 4;
 			while (line[i])
-				write(1, &line[i++], 1);
-			write (1, "\n", 1);
+				write(minish->redirfd, &line[i++], 1);
+			write (minish->redirfd, "\n", 1);
 			free(line);
 			return ;
 		}
@@ -64,7 +64,8 @@ void	handle_pwd(t_mini *minish)
 	}
 	line = malloc(PATH_MAX);
 	getcwd(line, PATH_MAX);
-	printf("%s\n", line);
+	write (minish->redirfd, line, ft_strlen(line));
+	write(minish->redirfd, "\n", 1);
 	ft_free(&line);
 }
 
@@ -104,7 +105,8 @@ void	handle_env(t_mini *minish)
 	i = 0;
 	while (minish->env[i] != NULL)
 	{
-		printf("%s\n", minish->env[i]);
+		write(minish->redirfd, minish->env[i], ft_strlen(minish->env[i]));
+		write(minish->redirfd, "\n", 1);
 		i++;
 	}
 }

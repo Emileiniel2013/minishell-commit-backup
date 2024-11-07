@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 11:41:14 by temil-da          #+#    #+#             */
-/*   Updated: 2024/11/07 16:54:26 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/11/07 18:13:46 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,13 +57,14 @@ void	child_execution(t_mini *minish, int prevpipefd, int *pipefd)
 		dup2(pipefd[1], STDOUT_FILENO);
 		close(pipefd[0]);
 		close(pipefd[1]);
+		minish->redirfd = STDOUT_FILENO;
 	}
 	else if (!minish->table->rightpipe && minish->out_redir)
+	{
 		dup2(minish->outfd, STDOUT_FILENO);
+		minish->redirfd = minish->outfd;
+	}
 	executor(minish);
-	status = minish->exit_code;
-	free_minish(minish, false);
-	exit(status);
 }
 
 void	executor(t_mini *minish)

@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 16:15:29 by temil-da          #+#    #+#             */
-/*   Updated: 2024/11/07 17:08:14 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/11/07 18:13:49 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,4 +55,13 @@ void	free_minish(t_mini *minish, bool keep_env)
 	}
 	free(minish);
 	minish = NULL;
+}
+
+void	exit_minish(t_mini *minish)
+{
+	int	status;
+
+	status = minish->exit_code;
+	free_minish(minish, false);
+	exit(status);
 }

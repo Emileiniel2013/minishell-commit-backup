@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 10:56:58 by temil-da          #+#    #+#             */
-/*   Updated: 2024/11/07 17:08:27 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/11/07 18:13:36 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,5 +75,6 @@ bool	check_nl(char *content);
 void	ft_free(char **content);
 void	free_arr(char **arr);
 void	free_minish(t_mini *minish, bool keep_env);
+void	exit_minish(t_mini *minish);
 
 #endif

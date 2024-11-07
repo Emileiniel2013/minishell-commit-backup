@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/02 17:50:07 by temil-da          #+#    #+#             */
-/*   Updated: 2024/11/04 15:25:15 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/11/07 18:16:23 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,5 @@ int	main(int argc, char *argv[], char *envp[])
 		if (minish->table_head)
 			free_table(minish);
 	}
-	free_minish(minish, false);
-	return (0);
+	exit_minish(minish);
 }

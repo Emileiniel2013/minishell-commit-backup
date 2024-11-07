@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 13:27:42 by temil-da          #+#    #+#             */
-/*   Updated: 2024/11/07 16:55:41 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/11/07 17:20:19 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,7 @@ typedef struct t_minishell
 	int		exit_code;
 	bool	success;
 	bool	append_mode;
+	int		redirfd;
 }		t_mini;
 
 // MAIN FUNCTIONS
