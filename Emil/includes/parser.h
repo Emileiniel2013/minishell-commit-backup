@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 13:32:53 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/30 17:50:33 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/11/04 19:05:10 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ char	**copy_env(char **envp);
 void	append_remainder(char **expanded_string, char **content, int pos);
 void	replace_varname_wtih_var(char **expanded_string, char **temp);
 
-// STRUCT ALOCATION
+// STRUCT CREATION
 void	add_token_to_table(t_table **table, t_tkn_lst *token_lst);
 void	add_cmd_node(t_table **table, char *content);
 void	allocate_table(t_table **table, bool leftpipe);

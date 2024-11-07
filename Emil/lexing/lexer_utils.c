@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/28 19:45:00 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/30 15:05:10 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/11/07 16:44:29 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,35 +65,4 @@ t_tkn_lst	*create_new_node(char *content, t_tkn token)
 	new_token->tkn = token;
 	new_token->next = NULL;
 	return (new_token);
-}
-
-void	write_err(t_mini *minish, int code, char *arg)
-{
-	if (!arg)
-	{
-		if (code == 16)
-		{
-			write(STDERR_FILENO, "Minishell: synthax error: u", 27);
-			write(STDERR_FILENO, "nmatched quote character\n", 26);
-		}
-		else if (code == 8 || code == 13 || code == 10)
-		{
-			write(STDERR_FILENO, "Minishell: syntax error near ", 29);
-			write(STDERR_FILENO, "unexpected token `newline'\n", 28);
-		}
-		else if (code == 15)
-			write(STDERR_FILENO, "Minishell: Failed to create heredoc file\n", 42);
-	}
-	else
-	{
-		if (code == 9 || code == 14 || code == 11 || code == 12)
-		{
-			write(STDERR_FILENO, "Minishell: syntax error ", 24);
-			write(STDERR_FILENO, "near unexpected token `", 23);
-			write(STDERR_FILENO, arg, ft_strlen(arg));
-			write(STDERR_FILENO, "'\n", 2);
-		}
-	}
-	minish->exit_code = code;
-	minish->success = false;
 }

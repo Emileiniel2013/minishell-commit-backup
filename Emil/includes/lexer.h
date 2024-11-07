@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 13:27:42 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/30 13:25:13 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/11/07 16:55:41 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,6 +97,10 @@ bool		ft_isspace(char index);
 char		*ft_strndup(char *s1, size_t len);
 t_tkn_lst	*create_new_node(char *content, t_tkn token);
 void		free_tkn_lst(t_tkn_lst *token_lst);
+
+// ERROR HANDLING
 void		write_err(t_mini *minish, int code, char *arg);
+void		write_simple_err(int code);
+void		write_arg_err(int code, char *arg);
 
 #endif

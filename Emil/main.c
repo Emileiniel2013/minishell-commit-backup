@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/02 17:50:07 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/29 12:58:15 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/11/04 15:25:15 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ int	main(int argc, char *argv[], char *envp[])
 			break ;
 		parse_input(line, minish);
 		free(line);
-		if (minish->table && handle_redirections(minish) != -1)
+		if (minish->table && (handle_redirections(minish) != -1))
 		{
 			if (!minish->table->rightpipe && check_builtin(minish))
 				executor(minish);
@@ -37,6 +37,6 @@ int	main(int argc, char *argv[], char *envp[])
 		if (minish->table_head)
 			free_table(minish);
 	}
-	free_mini(minish, false);
+	free_minish(minish, false);
 	return (0);
 }
