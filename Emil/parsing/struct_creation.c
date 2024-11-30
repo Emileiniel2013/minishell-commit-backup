@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 17:16:25 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/30 18:01:46 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/11/26 15:49:26 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,4 +79,17 @@ void	add_cmd_node(t_table **table, char *content)
 			current_node = current_node->next;
 		current_node->next = new_node;
 	}
+}
+
+int	creat_close_file(t_mini *minish)
+{
+	int	fd;
+
+	fd = -1;
+	fd = open(minish->out_redir, O_CREAT, 0644);
+	if (fd < 0)
+		return (write_err(minish, 7, NULL), -1);
+	close(fd);
+	free(minish->out_redir);
+	return (0);
 }

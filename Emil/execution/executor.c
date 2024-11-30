@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 11:41:14 by temil-da          #+#    #+#             */
-/*   Updated: 2024/11/07 18:13:46 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/11/30 21:24:01 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,9 +42,8 @@ void	mini_main(t_mini *minish)
 
 void	child_execution(t_mini *minish, int prevpipefd, int *pipefd)
 {
-	int	status;
-
-	status = 0;
+	signal(SIGQUIT, SIG_DFL);
+	signal(SIGINT, SIG_DFL);
 	if (minish->table->leftpipe)
 	{
 		dup2(prevpipefd, STDIN_FILENO);
@@ -65,6 +64,7 @@ void	child_execution(t_mini *minish, int prevpipefd, int *pipefd)
 		minish->redirfd = minish->outfd;
 	}
 	executor(minish);
+	exit_minish(minish);
 }
 
 void	executor(t_mini *minish)
@@ -120,6 +120,11 @@ void	execute_file(t_mini *minish)
 	char	*path;
 	char	*filename;
 
+	if (ft_strcmp(minish->table->command->content, "./") == 0)
+	{
+		write_err(minish, 29, NULL);
+		return ;
+	}
 	filename = ft_getcwd(minish);
 	path = ft_strjoin(filename, minish->table->command->content + 1);
 	ft_free(&filename);

@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 16:44:09 by temil-da          #+#    #+#             */
-/*   Updated: 2024/11/07 16:55:23 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/11/30 21:10:19 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,8 @@ void	write_simple_err(int code)
 		write(STDERR_FILENO, "Minishell: exit: too many arguments\n", 36);
 	else if (code == 7)
 		write(STDERR_FILENO, "Minishell: Error opening output file\n", 38);
+	else if (code == 29)
+		write(STDERR_FILENO, "Minishell: ./: is a directory\n", 31);
 }
 
 void	write_arg_err(int code, char *arg)
@@ -79,7 +81,7 @@ void	write_arg_err(int code, char *arg)
 		write(STDERR_FILENO, arg, ft_strlen(arg));
 		write(STDERR_FILENO, ": No such file or directory\n", 29);
 	}
-	else if (code == 23 || code == 24)
+	else if (code == 23 || code == 24 || code == 35 || code == 36)
 	{
 		write(STDERR_FILENO, "Minishell: ", 11);
 		write(STDERR_FILENO, arg, ft_strlen(arg));

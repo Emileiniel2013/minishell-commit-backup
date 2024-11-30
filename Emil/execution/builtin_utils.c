@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 17:04:18 by temil-da          #+#    #+#             */
-/*   Updated: 2024/11/07 16:17:56 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/11/30 21:10:05 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,4 +101,19 @@ char	*check_valid_cmd(char **paths, t_mini *minish)
 		i++;
 	}
 	return (path);
+}
+
+int		check_dir(char *path, t_mini *minish)
+{
+	if (strcmp(path, "/") == 0)
+	{
+		write(STDERR_FILENO, "Minishell: /: is a directory\n", 30);
+		minish->exit_code = 34;
+		return (-1);
+	}
+	else if (strcmp(path, "..") == 0)
+		return (write_err(minish, 35, path), -1);
+	else if (strcmp(path, ".") == 0)
+		return (write_err(minish, 36, path), -1);
+	return (0);
 }

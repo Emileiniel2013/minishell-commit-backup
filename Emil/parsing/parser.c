@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 14:43:06 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/30 18:00:52 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/11/28 18:28:25 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,8 @@ int	check_valid_redir_input(t_tkn_lst **token_lst, t_mini *minish)
 	else if ((*token_lst)->tkn == REDIROUT || (*token_lst)->tkn == REDIROUTAPP)
 	{
 		if (minish->out_redir)
-			free(minish->out_redir);
+			if (creat_close_file(minish) == -1)
+				return (-1);
 		minish->out_redir = ft_strdup((*token_lst)->next->content);
 	}
 	(*token_lst)->next->tkn = FILENAME;

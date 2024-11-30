@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/06 18:07:04 by temil-da          #+#    #+#             */
-/*   Updated: 2024/11/07 16:21:48 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/11/30 21:12:55 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,12 +74,15 @@ void	check_path(t_mini *minish)
 	char	*path;
 	char	**paths;
 
-	path = NULL;
+	path = ft_strdup(minish->table->command->content);
 	paths = NULL;
-	if (access(minish->table->command->content, X_OK) == 0)
-		execute_path(minish, minish->table->command->content);
+	if (check_dir(path, minish) == -1)
+		return (ft_free(&path));
+	if (access(path, X_OK) == 0)
+		execute_path(minish, path);
 	else
 	{
+		ft_free(&path);
 		path = ft_getenv(minish, "PATH");
 		if (!path)
 			return (write_err(minish, 24, minish->table->command->content));
@@ -128,8 +131,8 @@ void	execute_path(t_mini *minish, char *path)
 	char	**paths;
 	char	**env;
 
-	paths = list2array(minish);
 	env = minish->env;
+	paths = list2array(minish);
 	free_minish(minish, true);
 	execve(path, paths, env);
 }

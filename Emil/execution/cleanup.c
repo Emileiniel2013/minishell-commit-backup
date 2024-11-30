@@ -6,20 +6,11 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 16:15:29 by temil-da          #+#    #+#             */
-/*   Updated: 2024/11/07 18:13:49 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/11/11 12:02:18 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/executor.h"
-
-void	ft_free(char **content)
-{
-	if (*content)
-	{
-		free(*content);
-		*content = NULL;
-	}
-}
 
 void	free_arr(char **arr)
 {

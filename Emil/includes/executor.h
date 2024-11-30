@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 10:56:58 by temil-da          #+#    #+#             */
-/*   Updated: 2024/11/07 18:13:36 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/11/30 21:24:32 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ char	*ft_getcwd(t_mini *minish);
 int		handle_cd_home(t_mini *minish, char *path);
 int		handle_cd_oldpwd(t_mini *minish);
 char	*check_valid_cmd(char **paths, t_mini *minish);
+int		check_dir(char *path, t_mini *minish);
 
 // ENV MANIPULATION
 void	add_new_var_to_arr(char *newvar, t_mini *minish);
@@ -72,7 +73,6 @@ char	**list2array(t_mini *minish);
 bool	check_nl(char *content);
 
 // CLEANUP
-void	ft_free(char **content);
 void	free_arr(char **arr);
 void	free_minish(t_mini *minish, bool keep_env);
 void	exit_minish(t_mini *minish);

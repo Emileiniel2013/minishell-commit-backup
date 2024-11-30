@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 17:14:33 by temil-da          #+#    #+#             */
-/*   Updated: 2024/10/30 18:02:13 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/11/26 15:42:31 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,5 +55,14 @@ void	free_parser(t_mini *minish, t_tkn_lst *lst, t_table *table)
 	{
 		minish->table_head = table;
 		free_table(minish);
+	}
+}
+
+void	ft_free(char **content)
+{
+	if (*content)
+	{
+		free(*content);
+		*content = NULL;
 	}
 }

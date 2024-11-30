@@ -6,7 +6,7 @@
 /*   By: temil-da <temil-da@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 13:32:53 by temil-da          #+#    #+#             */
-/*   Updated: 2024/11/04 19:05:10 by temil-da         ###   ########.fr       */
+/*   Updated: 2024/11/26 15:51:12 by temil-da         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,10 +40,12 @@ void	replace_varname_wtih_var(char **expanded_string, char **temp);
 void	add_token_to_table(t_table **table, t_tkn_lst *token_lst);
 void	add_cmd_node(t_table **table, char *content);
 void	allocate_table(t_table **table, bool leftpipe);
+int		creat_close_file(t_mini *minish);
 
 // FREEING 
 void	free_table(t_mini *minish);
 void	free_cmd(t_cmd *cmd);
 void	free_parser(t_mini *minish, t_tkn_lst *lst, t_table *table);
+void	ft_free(char **content);
 
 #endif
